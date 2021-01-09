@@ -1,0 +1,162 @@
+
+In this guide, I will show you how to connect your React Native App to a prep-populated SQlite database, without expo.
+
+
+I spent many days to figure out how to use sqlite with react native.
+At the beginning, I was using Expo but it was buggy, not always loading my DB, but creating a new one.
+I strongly suggest not to use Expo but creating the DB yourself if you need to embed your data in your App.
+
+After days of vain efforts, searching on wrong or outdated guides, I finally found the right procedure to do it.
+
+Below, you will find the guide step by step. 
+If you are in a hurry, you can jump directly to this [REPO], with a working example.
+
+
+First Step
+Create a new React Native project with Typescript using 
+
+npx react-native init MyApp --template react-native-template-typescript
+
+
+It will take a few minutes to create.
+Once it is finished, let's install the sqlite library using npm/yarn
+
+npm install --save react-native-sqlite-storage
+
+# install typescript types
+npm install --save-dev @types/react-native-sqlite-storage
+
+
+
+Modify these files
+
+Go to android/app/build.gradle and paste these lines
+Be careful! There is a build.gradle file also in android/build.gradle. If you paste there, you will get an error!
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    //noinspection GradleDynamicVersion
+    implementation "com.facebook.react:react-native:+"  // From node_modules
+
+    implementation project(':react-native-sqlite-storage')
+
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+
+    debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
+      exclude group:'com.facebook.fbjni'
+    }
+
+    debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
+        exclude group:'com.facebook.flipper'
+        exclude group:'com.squareup.okhttp3', module:'okhttp'
+    }
+
+    debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}") {
+        exclude group:'com.facebook.flipper'
+    }
+
+    if (enableHermes) {
+        def hermesPath = "../../node_modules/hermes-engine/android/";
+        debugImplementation files(hermesPath + "hermes-debug.aar")
+        releaseImplementation files(hermesPath + "hermes-release.aar")
+    } else {
+        implementation jscFlavor
+    }
+}
+
+
+
+
+Now go to the file /android/settings.gradle
+Among Paste these lines
+
+include ':react-native-sqlite-storage'
+project(':react-native-sqlite-storage').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sqlite-storage/platforms/android')
+include ':react-native-sqlite-storage'
+project(':react-native-sqlite-storage').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sqlite-storage/platforms/android')
+include ':react-native-sqlite-storage'
+project(':react-native-sqlite-storage').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sqlite-storage/platforms/android') // react-native-sqlite-storage >= 4.0.0
+
+
+This is an example of what you should have:
+
+rootProject.name = 'MyApp'
+
+include ':react-native-sqlite-storage'
+project(':react-native-sqlite-storage').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sqlite-storage/platforms/android')
+include ':react-native-sqlite-storage'
+project(':react-native-sqlite-storage').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sqlite-storage/platforms/android')
+include ':react-native-sqlite-storage'
+project(':react-native-sqlite-storage').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sqlite-storage/platforms/android') // react-native-sqlite-storage >= 4.0.0
+
+
+apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
+include ':app'
+
+
+
+
+
+Now go to path "/android/src/main/" and create a folder "assets".
+Inside this folder create another folder called www
+In this folder we will place our database (.db file).
+
+The preferred software  to create the DB locally is https://sqlitebrowser.org/ .
+This is a testDB I created that you can download from here.
+
+So, to recap, you should have a .db file at the path  "/android/src/main/assets/www/".
+Like so: "/android/src/main/assets/www/test.db"
+
+
+Now, we are almost done.
+Let's go to the root of our project and open App.tsx.
+
+Import sqlite
+
+import SQLite from 'react-native-sqlite-storage';
+
+Open the db. You should change the name of the .db file you gave.
+createFromLocation is just for IOS, his value will be ignored by android
+
+const db = SQLite.openDatabase(
+  {
+    name: 'test.db',
+    location: 'default',
+    createFromLocation: 1,
+  },
+  () => {
+    console.log('ok');
+  },
+  (error) => {
+    console.log(error);
+  },
+);
+
+
+Let's execute a simple query to check if our db works
+Inside App.tsx, let's execute this query when the App mounts
+
+React.useEffect(() => {
+    console.log('calling useEffect');
+    db.transaction((tx) => {
+      tx.executeSql('SELECT * FROM test;', [], (tx, results) => {
+        const rows = results.rows;
+        let users = [];
+
+        for (let i = 0; i < rows.length; i++) {
+          users.push({
+            ...rows.item(i),
+          });
+        }
+        console.log('user', users);
+      });
+    });
+  });
+
+
+  Check Your Terminal, you should see the result query being loaded.
+
+  Debugging
+  If and error occurs, go back and check your paths and if every step was correct.
+  If something fails during compilation, check you android sdk path
+  IOS version coming soon 
