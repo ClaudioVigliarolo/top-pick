@@ -1,0 +1,39 @@
+
+[
+     {
+    "text": "#000",
+    "background": "#fff",
+    "tint": "tintColorLight",
+    "tabIconDefault": "#ccc",
+    "tabIconSelected": "tintColorLight",
+    "primaryOrange":"#FF851B",
+    "whiteText":"#fff",
+    "secondaryIcon": "black",
+    "primaryText": "black",
+    "darkerOrange": "#f4511e",
+    "lighterOrange": "orange",
+    "lightGray":"#c4c4c4",
+    "checkOrange":"#ffc757",
+    "primaryBackground": "#fff",
+    "invertedColor":"black"
+
+  }, {
+    "text": "#000",
+    "background": "#fff",
+    "tint": "tintColorLight",
+    "tabIconDefault": "#ccc",
+    "tabIconSelected": "tintColorLight",
+    "primaryOrange":"green",
+    "whiteText":"#fff",
+    "secondaryIcon": "black",
+    "primaryText": "black",
+    "darkerOrange": "#f4511e",
+    "lighterOrange": "orange",
+    "lightGray":"#c4c4c4",
+    "checkOrange":"#ffc757",
+    "primaryBackground": "#fff",
+    "invertedColor":"black"
+  }
+
+]
+
