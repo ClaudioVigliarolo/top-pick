@@ -26,7 +26,7 @@ interface BottomButtonsState {
 const styles = StyleSheet.create({
   container: {
     height: Dimensions.bottomButtonsHeight,
-    width: Dimensions.SCREEN_WIDTH,
+    width: '100%',
     borderTopWidth: 2,
     padding: 10,
   },

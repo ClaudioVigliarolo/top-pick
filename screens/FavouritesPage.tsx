@@ -20,6 +20,7 @@ const db = SQLite.openDatabase(
 );
 
 interface Question {
+  id: number;
   title: string;
   selected: boolean;
   liked: boolean;
@@ -27,9 +28,14 @@ interface Question {
 
 export default function CategoryList({navigation}: {navigation: any}) {
   const [items, setItems] = React.useState<Question[]>([]);
-  const {theme, setTheme} = React.useContext(ThemeContext);
+  const [isLoading, setLoading] = React.useState<boolean>(true);
 
+  const {theme, setTheme} = React.useContext(ThemeContext);
   React.useEffect(() => {
+    getItems();
+  }, [items.length]); // Only re-run the effect if count changes
+
+  const getItems = () => {
     db.transaction((tx) => {
       tx.executeSql(
         `SELECT * from questions
@@ -44,27 +50,24 @@ export default function CategoryList({navigation}: {navigation: any}) {
             });
           }
           setItems([...newArr]);
+          setLoading(false);
         },
       );
     });
-  });
+  };
 
-  const onDislike = (title: string) => {
-    console.log('callll', title);
-    let itemsCopy = [...items];
-    const index = items.findIndex((item) => item.title == title);
-    console.log(index);
+  const onDislike = (id: number) => {
+    console.log('idddd', id);
+    const index = items.findIndex((item) => item.id == id);
     const newVal = !items[index].liked;
     db.transaction((tx) => {
       tx.executeSql(
         `UPDATE "questions"
-        SET liked = 1
-        WHERE "title" = ${title}`,
+        SET liked = ${newVal ? 1 : 0}
+        WHERE "id" = ${id}`,
         [],
         (tx, results) => {
-          console.log('okkkkkk');
-          items[index].liked = newVal;
-          setItems(itemsCopy.slice());
+          getItems();
         },
       );
     });
@@ -87,6 +90,7 @@ export default function CategoryList({navigation}: {navigation: any}) {
         text={item.title}
         isActive={isActive}
         liked={item.liked}
+        id={item.id}
         onLike={onDislike}
         backgroundColor={Colors[theme].primaryBackground}
         opacity={isActive ? 0.6 : 1}
@@ -100,6 +104,12 @@ export default function CategoryList({navigation}: {navigation: any}) {
       flexDirection: 'column',
       backgroundColor: Colors[theme].primaryBackground,
     },
+
+    text: {
+      color: Colors[theme].primaryOrange,
+      textAlign: 'center',
+      fontSize: Dimensions.fontMed,
+    },
   });
   return (
     <View
@@ -109,12 +119,17 @@ export default function CategoryList({navigation}: {navigation: any}) {
         justifyContent: 'center',
         backgroundColor: Colors[theme].primaryBackground,
       }}>
-      <DraggableFlatList
-        data={items}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => `draggable-item-${index}`}
-        onDragEnd={({data}) => setItems(data)}
-      />
+      {!isLoading && items.length == 0 && (
+        <Text style={styles.text}>No Liked Questions</Text>
+      )}
+      {items.length > 0 && (
+        <DraggableFlatList
+          data={items}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => `draggable-item-${item.id}`}
+          onDragEnd={({data}) => setItems(data)}
+        />
+      )}
     </View>
   );
 }

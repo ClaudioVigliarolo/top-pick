@@ -8,6 +8,8 @@ target 'MyApp' do
 
   use_react_native!(:path => config["reactNativePath"])
 
+  pod 'RNFileViewer', :path => '../node_modules/react-native-file-viewer'
+
   target 'MyAppTests' do
     inherit! :complete
     # Pods for testing

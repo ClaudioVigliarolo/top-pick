@@ -1,38 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from 'react';
 import {
   View,
   TouchableOpacity,
-  Dimensions,
   Animated,
   StyleSheet,
   Platform,
   Keyboard,
-} from "react-native";
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { BottomMenuItem } from "../components/buttons/BottomMenuItem";
+  Dimensions as Dim,
+} from 'react-native';
+import Dimensions from '../constants/Dimensions';
+import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
+import {BottomMenuItem} from '../components/buttons/BottomMenuItem';
 
-export const TabBar = ({
-  state,
-  descriptors,
-  navigation,
-}: BottomTabBarProps) => {
+export const TabBar = ({state, descriptors, navigation}: BottomTabBarProps) => {
   const [visible, setVisible] = useState(true);
-  const totalWidth = Dimensions.get("window").width;
-  const tabWidth = totalWidth / state.routes.length;
-  const focusedOptions = descriptors[state.routes[state.index].key];
   useEffect(() => {
     let keyboardEventListeners: any;
-    if (Platform.OS === "android") {
+    if (Platform.OS === 'android') {
       keyboardEventListeners = [
-        Keyboard.addListener("keyboardDidShow", () => setVisible(false)),
-        Keyboard.addListener("keyboardDidHide", () => setVisible(true)),
+        Keyboard.addListener('keyboardDidShow', () => setVisible(false)),
+        Keyboard.addListener('keyboardDidHide', () => setVisible(true)),
       ];
     }
     return () => {
-      if (Platform.OS === "android") {
+      if (Platform.OS === 'android') {
         keyboardEventListeners &&
           keyboardEventListeners.forEach((eventListener) =>
-            eventListener.remove()
+            eventListener.remove(),
           );
       }
     };
@@ -40,12 +34,12 @@ export const TabBar = ({
 
   const style = StyleSheet.create({
     tabContainer: {
-      height: 50,
-      backgroundColor: "white",
+      height: Dimensions.tabHeight,
+      backgroundColor: 'white',
       borderTopRightRadius: 20,
       borderTopLeftRadius: 20,
       elevation: 10,
-      position: "absolute",
+      position: 'absolute',
       bottom: 0,
     },
   });
@@ -56,10 +50,10 @@ export const TabBar = ({
   )
     return null;
   return (
-    <View style={[style.tabContainer, { width: totalWidth }]}>
-      <View style={{ flexDirection: "row" }}>
+    <View style={[style.tabContainer, {width: '100%'}]}>
+      <View style={{flexDirection: 'row'}}>
         {state.routes.map((route, index) => {
-          const { options } = descriptors[route.key];
+          const {options} = descriptors[route.key];
           const label =
             options.tabBarLabel !== undefined
               ? options.tabBarLabel
@@ -71,7 +65,7 @@ export const TabBar = ({
 
           const onPress = () => {
             const event = navigation.emit({
-              type: "tabPress",
+              type: 'tabPress',
               target: route.key,
               canPreventDefault: true,
             });
@@ -85,13 +79,12 @@ export const TabBar = ({
             <TouchableOpacity
               activeOpacity={0.95}
               accessibilityRole="button"
-              accessibilityStates={isFocused ? ["selected"] : []}
+              accessibilityStates={isFocused ? ['selected'] : []}
               accessibilityLabel={options.tabBarAccessibilityLabel}
               testID={options.tabBarTestID}
               onPress={onPress}
-              style={{ flex: 1 }}
-              key={index}
-            >
+              style={{flex: 1}}
+              key={index}>
               <BottomMenuItem
                 iconName={label.toString()}
                 isCurrent={isFocused}

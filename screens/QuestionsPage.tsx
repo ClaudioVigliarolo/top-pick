@@ -27,6 +27,7 @@ const db = SQLite.openDatabase(
 let _listViewOffset = 0;
 
 interface Question {
+  id: number;
   title: string;
   selected: boolean;
   liked: boolean;
@@ -43,7 +44,9 @@ export default function QuestionsPage({
   const [filter, setFilter] = React.useState('');
   const [counter, setCounter] = React.useState(0);
   const {theme, setTheme} = React.useContext(ThemeContext);
-
+  const [isFlatListBeingTouched, setIsFlatListBeingTouched] = React.useState(
+    false,
+  );
   const [isActionButtonVisible, setActionButtonVisible] = React.useState(true);
 
   const {topic} = route.params;
@@ -109,7 +112,7 @@ export default function QuestionsPage({
     // If the user is scrolling down (and the action-button is still visible) hide it
 
     const isActionButtonVisible =
-      direction === 'up' || event.nativeEvent.contentOffset.y < 10;
+      direction === 'up' || event.nativeEvent.contentOffset.y < 100;
     if (isActionButtonVisible) {
       setActionButtonVisible(true);
     } else {
@@ -128,6 +131,12 @@ export default function QuestionsPage({
     setItems(itemsCopy.slice());
   };
 
+  const removeHighliteWithDelay = () => {
+    setTimeout(function () {
+      setIsFlatListBeingTouched(false);
+    }, 200);
+  };
+
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -144,6 +153,7 @@ export default function QuestionsPage({
     },
   });
   {
+    console.log('cazz0', items);
   }
   return (
     <React.Fragment>
@@ -159,8 +169,11 @@ export default function QuestionsPage({
       <ScrollView
         style={styles.container}
         onScroll={_onScroll}
-        //onScrollEndDrag={() => setActionButtonVisible(true)}
-      >
+        onTouchStart={(_) => setIsFlatListBeingTouched(true)}
+        onMomentumScrollEnd={(_) => {
+          setIsFlatListBeingTouched(false);
+        }}
+        onTouchEnd={(_) => removeHighliteWithDelay()}>
         {items.map((item: Question, i) => {
           if (item.title.toLowerCase().includes(filter.toLowerCase())) {
             // console.log(item);
@@ -175,7 +188,7 @@ export default function QuestionsPage({
           }
         })}
       </ScrollView>
-      <View>
+      <View style={{}}>
         <BottomButton
           onPress={onSubmit}
           text="Next"

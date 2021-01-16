@@ -25,13 +25,12 @@ const db = SQLite.openDatabase(
 const INITIALS_TOPICS_LOADED = 10;
 const NEW_TOPICS_LOADED = 10;
 
-const FirstPage = ({navigation}: {navigation: any}) => {
-  const carosello = React.useRef(null);
+const HomePage = ({navigation}: {navigation: any}) => {
+  const mycarousel = React.useRef(null);
   const [topic, setTopic] = React.useState('');
   const [carouselItems, setCarouselItems] = React.useState<Topic[]>([]);
   const [carouselIndex, setCarouselIndex] = React.useState(0);
   const {theme, setTheme} = React.useContext(ThemeContext);
-  const myCarousel = React.createRef();
 
   React.useEffect(() => {
     loadTopics(INITIALS_TOPICS_LOADED);
@@ -71,6 +70,9 @@ const FirstPage = ({navigation}: {navigation: any}) => {
       params: {topic},
     });
   };
+  {
+    console.log(mycarousel.current);
+  }
 
   return (
     <SafeAreaView
@@ -83,44 +85,42 @@ const FirstPage = ({navigation}: {navigation: any}) => {
       }}>
       <View
         style={{
+          flex: 6,
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+        }}>
+        <TopicsCarousel
+          setIndex={(index: number) => {
+            setCarouselIndex(index);
+            getNewTopics(index);
+          }}
+          onTopicPress={(topic: string) => goQuestionsPage(topic)}
+          activeIndex={carouselIndex}
+          ref={mycarousel}
+          carouselItems={carouselItems}
+        />
+      </View>
+      <View
+        style={{
           flex: 1,
-          padding: 16,
-          flexDirection: 'column',
-          width: Dimensions.SCREEN_WIDTH,
+          alignItems: 'center',
+          width: '100%',
+          marginBottom: Dimensions.tabHeight,
           justifyContent: 'center',
         }}>
-        <View style={{flex: 1, alignItems: 'center'}}>
-          <TopicsCarousel
-            setIndex={(index: number) => {
-              setCarouselIndex(index);
-              getNewTopics(index);
-            }}
-            onTopicPress={(topic: string) => goQuestionsPage(topic)}
-            ref={carosello}
-            activeIndex={carouselIndex}
-            carouselItems={carouselItems}
-          />
-        </View>
-        <View
-          style={{
-            maxHeight: Dimensions.SCREEN_HEIGHT / 7,
-            flex: 1,
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}>
-          <Button
-            color={Colors[theme].primaryOrange}
-            title="Pick A Topic"
-            onPress={() => {
-              carosello.current && carosello.current._carousel.snapToNext();
-              getNewTopics(carouselIndex + 1);
-              setCarouselIndex(carouselIndex + 1);
-            }}
-          />
-        </View>
+        <Button
+          color={Colors[theme].primaryOrange}
+          title="Pick A Topic"
+          onPress={() => {
+            mycarousel.current && mycarousel.current.getCarousel().snapToNext();
+            getNewTopics(carouselIndex + 1);
+            setCarouselIndex(carouselIndex + 1);
+          }}
+        />
       </View>
     </SafeAreaView>
   );
 };
 
-export default FirstPage;
+export default HomePage;

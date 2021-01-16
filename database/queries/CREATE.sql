@@ -13,11 +13,6 @@ CREATE TABLE "topics" (
 
 );
 
-CREATE TABLE "questions" (
-	"topic"	TEXT,
-	"name"	TEXT,
-	FOREIGN KEY("topic") REFERENCES "topics"("title")
-);
 
 
 
@@ -30,4 +25,10 @@ CREATE TABLE "category_topics" (
 );
 
 
-
+CREATE TABLE "questions" (
+	"id" integer primary key autoincrement,
+	"topic"	TEXT,
+	"title"	TEXT,
+	"liked" NUMERIC DEFAULT 0,
+	FOREIGN KEY("topic") REFERENCES "topics"("title")
+);

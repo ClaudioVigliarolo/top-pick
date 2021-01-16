@@ -1,12 +1,21 @@
 import React, {Component} from 'react';
-import {View, TouchableOpacity, Text, Platform} from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  Platform,
+  Alert,
+  PermissionsAndroid,
+} from 'react-native';
 import Colors from '../constants/Colors';
+import FileViewer from 'react-native-file-viewer';
 import BottomButton from '../components/buttons/BottomButtons';
 import Dimensions from '../constants/Dimensions';
 import ThemeContext from '../context/ThemeContext';
 import ListItemDrag from '../components/list/ListItemDrag';
 import DraggableFlatList from 'react-native-draggable-flatlist';
-import ButtonsModal from '../components/buttons/ButtonsModal';
+import BottomsDownToUp from '../components/buttons/BottomsDownToUp';
+
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import SQLite from 'react-native-sqlite-storage';
 
@@ -21,16 +30,10 @@ const db = SQLite.openDatabase(
 );
 
 interface Question {
+  id: number;
   title: string;
   selected: boolean;
   liked: boolean;
-}
-
-interface Data {
-  key: number;
-  id: number;
-  name: string;
-  function: string;
 }
 
 export default function OrderPage({
@@ -47,6 +50,7 @@ export default function OrderPage({
   const [items, setItems] = React.useState<Question[]>([]);
   const [isMenuOptionShown, showMenuOption] = React.useState<boolean>(false);
   const {theme, setTheme} = React.useContext(ThemeContext);
+  let actionSheet = React.useRef<HTMLInputElement>();
   const renderItem = ({
     item,
     index,
@@ -65,57 +69,87 @@ export default function OrderPage({
         isActive={isActive}
         liked={item.liked}
         onLike={onLike}
+        id={item.id}
         backgroundColor={Colors[theme].primaryBackground}
         opacity={isActive ? 0.6 : 1}
       />
     );
   };
 
-  const createPDF = async (html: any) => {
-    let options = {
-      html: html,
-      fileName: topic,
-      directory: 'Documents/Topics',
-    };
-
-    let file = await RNHTMLtoPDF.convert(options);
-    console.log(file);
+  const showActionSheet = () => {
+    //To show the Bottom ActionSheet
+    actionSheet.current.show();
   };
 
-  const onLike = (title: string) => {
-    console.log('callll', title);
+  const createPDF = async (htmlContent: string) => {
+    if (await isPermitted()) {
+      let options = {
+        //Content to print
+        html: htmlContent,
+        //File Name
+        fileName: topic,
+        //File directory
+        directory: 'Top Picks',
+      };
+      let file = await RNHTMLtoPDF.convert(options);
+      console.log(file.filePath);
+      const path = FileViewer.open(file.filePath)
+        .then(() => {
+          console.log('ok open');
+        })
+        .catch((error) => {
+          console.log('error opening');
+        });
+    }
+  };
+
+  const isPermitted = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          {
+            title: 'External Storage Write Permission',
+            message: 'App needs access to Storage data',
+          },
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } catch (err) {
+        Alert.alert('Write permission err', err);
+        return false;
+      }
+    } else {
+      return true;
+    }
+  };
+
+  const onLike = (id: number) => {
     let itemsCopy = [...items];
-    const index = items.findIndex((item) => item.title == title);
+    const index = items.findIndex((item) => item.id == id);
     console.log(index);
     const newVal = !items[index].liked;
     db.transaction((tx) => {
       tx.executeSql(
         `UPDATE "questions"
-        SET liked = 1
-        WHERE "title" = ${title}`,
+        SET liked = ${newVal ? 1 : 0}
+        WHERE "id" = ${id}`,
         [],
         (tx, results) => {
           console.log('okkkkkk');
           items[index].liked = newVal;
           setItems(itemsCopy.slice());
         },
+        (err) => {
+          console.log(err);
+        },
       );
     });
   };
 
-  const ButtonsModalData: Data[] = [
-    {
-      key: 0,
-      id: 0,
-      name: 'Export to PDF',
-      function: 'exportToPdf',
-    },
-    {
-      key: 1,
-      id: 1,
-      name: 'Start Presentation',
-      function: 'goPresentation',
-    },
+  const BottomsDownToUpData: string[] = [
+    'Export to PDF',
+    'Start Presentation',
+    'Close',
   ];
 
   React.useEffect(() => {
@@ -131,14 +165,15 @@ export default function OrderPage({
 
   const handleButtons = (functionName: string): void => {
     switch (functionName) {
-      case 'exportToPdf':
+      case 'Export to PDF':
         createPDF(htmlContent);
         break;
 
-      case 'goPresentation':
+      case 'Start Presentation':
         goPresentation();
         break;
-
+      case 'Close':
+        actionSheet.current.hide();
       default:
         break;
     }
@@ -175,6 +210,10 @@ export default function OrderPage({
     </body>
   </html>
 `;
+
+  {
+    console.log('mmmaa', items);
+  }
   return (
     <View
       style={{
@@ -186,20 +225,23 @@ export default function OrderPage({
       <DraggableFlatList
         data={items}
         renderItem={renderItem}
-        keyExtractor={(item, index) => `draggable-item-${index}`}
-        onDragEnd={({items}) => setItems(items)}
+        keyExtractor={(item, index) => `draggable-item-${item.id}`}
+        onDragEnd={({data}) => setItems(data)}
       />
       {/*showMenuOption(true)*/}
       <BottomButton
-        onPress={() => showMenuOption(true)}
+        onPress={() => {
+          actionSheet.current.show();
+        }}
         text="I'm Ready! "
         isButtonEnabled={true}
         isTextEnabled={false}
         visible={true}
       />
-      <ButtonsModal
-        data={ButtonsModalData}
+      <BottomsDownToUp
+        data={BottomsDownToUpData}
         isActive={isMenuOptionShown}
+        actionSheet={actionSheet}
         backgroundColor={Colors[theme].primaryBackground}
         color={Colors[theme].primaryOrange}
         onPress={(functionName: string) => {
@@ -207,7 +249,7 @@ export default function OrderPage({
           handleButtons(functionName);
         }}
         title="Now Is The Time"
-        onHide={() => showMenuOption(false)}
+        onHide={() => actionSheet.current.hide()}
       />
     </View>
   );

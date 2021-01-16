@@ -79,7 +79,6 @@ const App = () => {
               ...rows.item(i),
             });
           }
-          console.log('user', users);
         },
       );
     });

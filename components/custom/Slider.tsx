@@ -1,5 +1,11 @@
 import * as React from 'react';
-import {PixelRatio, SafeAreaView, ScrollView, StatusBar} from 'react-native';
+import {
+  PixelRatio,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Dimensions as Dim,
+} from 'react-native';
 import {Text, View, StyleSheet, Image} from 'react-native';
 import Dimensions from '../../constants/Dimensions';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -17,11 +23,18 @@ interface SliderProps {
   onClose(): void;
 }
 
-const width = Dimensions.SCREEN_WIDTH;
-const height = Dimensions.SCREEN_HEIGHT;
 const Slider = (props: SliderProps) => {
   const [sliderState, setSliderState] = React.useState({currentPage: 0});
+  const [width, setWidth] = React.useState<number>(Dim.get('window').width);
+  const [height, setheight] = React.useState<number>(Dim.get('window').height);
 
+  React.useEffect(() => {
+    Dim.addEventListener('change', (e) => {
+      const {width, height} = e.window;
+      setWidth(width);
+      setheight(height);
+    });
+  }, []);
   const setSliderPage = (event: any) => {
     const {currentPage} = sliderState;
     const {x} = event.nativeEvent.contentOffset;
@@ -78,7 +91,7 @@ const Slider = (props: SliderProps) => {
       height: 10,
       width: 10,
       borderRadius: 10 / 2,
-      backgroundColor: '#f4511e',
+      backgroundColor: 'red',
       marginLeft: 10,
     },
     titleSection: {
@@ -135,7 +148,7 @@ const Slider = (props: SliderProps) => {
             <View
               style={[
                 styles.paginationDots,
-                {opacity: pageIndex === index ? 1 : 0.2},
+                {opacity: pageIndex === index ? 1 : 0.5},
               ]}
               key={index}
             />

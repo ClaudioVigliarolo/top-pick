@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 import {
   Container,
   Header,
@@ -7,13 +7,13 @@ import {
   ListItem,
   Text,
   Right,
-} from "native-base";
-import ThemeContext from "../../context/ThemeContext";
-import { View, StyleSheet } from "react-native";
-import Colors from "../../constants/Colors";
-import Icon from "react-native-vector-icons/AntDesign";
+} from 'native-base';
+import ThemeContext from '../../context/ThemeContext';
+import {View, StyleSheet} from 'react-native';
+import Colors from '../../constants/Colors';
+import Icon from 'react-native-vector-icons/AntDesign';
 
-import Dimensions from "../../constants/Dimensions";
+import Dimensions from '../../constants/Dimensions';
 
 interface CustomListItemProps {
   text: string;
@@ -22,21 +22,20 @@ interface CustomListItemProps {
 }
 
 const CustomListItem = (props: CustomListItemProps) => {
-  const { theme, setTheme } = React.useContext(ThemeContext);
+  const {theme, setTheme} = React.useContext(ThemeContext);
 
   return (
     <ListItem style={styles.container} onPress={props.onPress}>
-      <Text style={{ color: Colors[theme].primaryText }}>{props.text}</Text>
+      <Text style={{color: Colors[theme].primaryText}}>{props.text}</Text>
       <Text
         style={{
           color: Colors[theme].lightGray,
-          position: "absolute",
-          right: "20%",
-        }}
-      >
+          position: 'absolute',
+          right: '20%',
+        }}>
         {props.secondaryText}
       </Text>
-      <Right style={{ position: "absolute", right: "10%" }}>
+      <Right style={{position: 'absolute', right: '10%'}}>
         <Icon
           name="right"
           color={Colors[theme].lightGray}
@@ -51,7 +50,7 @@ export default CustomListItem;
 
 const styles = StyleSheet.create({
   container: {
-    width: Dimensions.SCREEN_WIDTH,
-    position: "relative",
+    width: '100%',
+    position: 'relative',
   },
 });

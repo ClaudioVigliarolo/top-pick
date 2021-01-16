@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 import {
   Container,
   Header,
@@ -7,13 +7,13 @@ import {
   ListItem,
   Text,
   Right,
-} from "native-base";
-import { View, StyleSheet } from "react-native";
-import ThemeContext from "../../context/ThemeContext";
-import Colors from "../../constants/Colors";
-import Icon from "react-native-vector-icons/AntDesign";
-import CheckBox from "@react-native-community/checkbox";
-import Dimensions from "../../constants/Dimensions";
+} from 'native-base';
+import {View, StyleSheet} from 'react-native';
+import ThemeContext from '../../context/ThemeContext';
+import Colors from '../../constants/Colors';
+import Icon from 'react-native-vector-icons/AntDesign';
+import CheckBox from '@react-native-community/checkbox';
+import Dimensions from '../../constants/Dimensions';
 
 interface ListItemCheckBoxProps {
   text: string;
@@ -23,14 +23,14 @@ interface ListItemCheckBoxProps {
 }
 
 const ListItemCheckBox = (props: ListItemCheckBoxProps) => {
-  const { theme, setTheme } = React.useContext(ThemeContext);
+  const {theme, setTheme} = React.useContext(ThemeContext);
 
   return (
     <ListItem style={styles.container} onPress={props.onPress}>
       <View style={styles.textContainer}>
-        <Text style={{ color: Colors[theme].primaryText }}>{props.text}</Text>
+        <Text style={{color: Colors[theme].primaryText}}>{props.text}</Text>
       </View>
-      <Right style={{ position: "absolute", right: "10%" }}>
+      <Right style={{position: 'absolute', right: '10%'}}>
         <CheckBox
           disabled={false}
           tintColors={{
@@ -49,10 +49,10 @@ export default ListItemCheckBox;
 
 const styles = StyleSheet.create({
   container: {
-    width: Dimensions.SCREEN_WIDTH,
-    position: "relative",
+    width: '100%',
+    position: 'relative',
   },
   textContainer: {
-    maxWidth: "82%",
+    maxWidth: '82%',
   },
 });

@@ -17,13 +17,14 @@ import LikeIcon from 'react-native-vector-icons/AntDesign';
 import Dimensions from '../../constants/Dimensions';
 
 interface CustomListItemProps {
+  id: number;
   text: string;
   backgroundColor: string;
   isActive: boolean;
   liked: boolean;
   opacity: number;
   onLongPress(): void;
-  onLike(title: string): void;
+  onLike(id: number): void;
 }
 
 const CustomListItem = (props: CustomListItemProps) => {
@@ -49,9 +50,9 @@ const CustomListItem = (props: CustomListItemProps) => {
           }}>
           <LikeIcon
             name={props.liked ? 'heart' : 'hearto'}
-            color={Colors[theme].lightGray}
+            color={Colors[theme].primaryOrange}
             size={Dimensions.iconMedSmall}
-            onPress={() => props.onLike(props.text)}
+            onPress={() => props.onLike(props.id)}
             style={{marginRight: 5}}
           />
           <Icon
@@ -69,7 +70,7 @@ export default CustomListItem;
 
 const styles = StyleSheet.create({
   container: {
-    width: Dimensions.SCREEN_WIDTH,
+    width: '100%',
   },
   textContainer: {
     maxWidth: '80%',
