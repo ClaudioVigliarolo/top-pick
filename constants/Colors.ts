@@ -53,7 +53,7 @@ const dark = {
   lighterGray:'#e0e0e0',
   lightGray:'#c4c4c4',
   checkOrange:"#ffc757",
-  primaryBackground: '#131313',
+  primaryBackground: 'black',
   invertedColor:'black',
   headerPrimary: '#f4511e',
   primaryHeaderBackground: "#1F1F1F",

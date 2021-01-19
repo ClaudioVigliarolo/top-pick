@@ -9,7 +9,7 @@ import {
   Right,
 } from 'native-base';
 import ThemeContext from '../../context/ThemeContext';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, TouchableWithoutFeedback} from 'react-native';
 import Colors from '../../constants/Colors';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LikeIcon from 'react-native-vector-icons/AntDesign';
@@ -23,8 +23,9 @@ interface CustomListItemProps {
   isActive: boolean;
   liked: boolean;
   opacity: number;
-  onLongPress(): void;
+  onDrag(): void;
   onLike(id: number): void;
+  number: number;
 }
 
 const CustomListItem = (props: CustomListItemProps) => {
@@ -37,31 +38,44 @@ const CustomListItem = (props: CustomListItemProps) => {
       style={[
         styles.container,
         {backgroundColor: props.backgroundColor, opacity: props.opacity},
-      ]}
-      onLongPress={props.onLongPress}>
-      <View style={styles.textContainer}>
-        <Text style={{color: Colors[theme].primaryText}}>{props.text}</Text>
-      </View>
-      <Right style={{position: 'absolute', right: '2%'}}>
-        <View
+      ]}>
+      <View style={styles.numberContainer}>
+        <Text
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
+            color: Colors[theme].primaryText,
+            textAlignVertical: 'center',
+            fontWeight: 'bold',
           }}>
-          <LikeIcon
-            name={props.liked ? 'heart' : 'hearto'}
-            color={Colors[theme].primaryOrange}
-            size={Dimensions.iconMedSmall}
-            onPress={() => props.onLike(props.id)}
-            style={{marginRight: 5}}
-          />
+          {props.number}
+        </Text>
+      </View>
+
+      <View style={styles.textContainer}>
+        <Text
+          style={{
+            color: Colors[theme].primaryText,
+            textAlignVertical: 'center',
+            textAlign: 'left',
+          }}>
+          {props.text.replace(/^\s+/g, '')}
+        </Text>
+      </View>
+      <View style={styles.iconContainer}>
+        <LikeIcon
+          name={props.liked ? 'heart' : 'hearto'}
+          color={Colors[theme].primaryOrange}
+          size={Dimensions.iconMedSmall}
+          onPress={() => props.onLike(props.id)}
+          style={{marginRight: 5}}
+        />
+        <TouchableWithoutFeedback onPressIn={props.onDrag}>
           <Icon
             name="drag"
             color={Colors[theme].lightGray}
             size={Dimensions.iconMed}
           />
-        </View>
-      </Right>
+        </TouchableWithoutFeedback>
+      </View>
     </ListItem>
   );
 };
@@ -71,8 +85,29 @@ export default CustomListItem;
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   textContainer: {
-    maxWidth: '80%',
+    flex: 9,
+    height: '100%',
+    padding: 0,
+  },
+  numberContainer: {
+    margin: 5,
+    marginLeft: 0,
+    flex: 1,
+
+    alignItems: 'center',
+  },
+  numberText: {
+    fontWeight: 'bold',
+  },
+  iconContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flex: 2,
   },
 });

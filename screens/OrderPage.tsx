@@ -64,14 +64,15 @@ export default function OrderPage({
   }) => {
     return (
       <ListItemDrag
-        onLongPress={drag}
+        onDrag={drag}
+        number={index + 1}
         text={item.title}
         isActive={isActive}
         liked={item.liked}
         onLike={onLike}
         id={item.id}
         backgroundColor={Colors[theme].primaryBackground}
-        opacity={isActive ? 0.6 : 1}
+        opacity={isActive ? 0.7 : 1}
       />
     );
   };

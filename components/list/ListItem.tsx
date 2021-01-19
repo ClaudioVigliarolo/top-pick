@@ -26,7 +26,9 @@ const CustomListItem = (props: CustomListItemProps) => {
 
   return (
     <ListItem style={styles.container} onPress={props.onPress}>
-      <Text style={{color: Colors[theme].primaryText}}>{props.text}</Text>
+      <Text style={{color: Colors[theme].primaryText}}>
+        {props.text.replace(/\s+/g, ' ').trim()}
+      </Text>
       <Text
         style={{
           color: Colors[theme].lightGray,

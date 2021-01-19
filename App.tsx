@@ -11,6 +11,7 @@ import SQLite, {
   SQLiteDatabase,
   Transaction,
 } from 'react-native-sqlite-storage';
+import StartSlides from './startSlides/StartSlider';
 
 const db = SQLite.openDatabase(
   {
@@ -22,9 +23,12 @@ const db = SQLite.openDatabase(
   () => {},
 );
 
+// 0: loading, 1: already launched, 2: firstLaunch
+
 const App = () => {
   const [loading, setLoading] = React.useState(true);
   const [theme, setStateTheme] = React.useState('light');
+  const [isFirstLaunch, setFirstLaunch] = React.useState(false);
 
   const readTheme = async () => {
     try {
@@ -45,6 +49,10 @@ const App = () => {
     })();
 
     (async () => {
+      checkIfFirstLaunch();
+    })();
+
+    (async () => {
       loadDB();
     })();
 
@@ -54,6 +62,20 @@ const App = () => {
     })();
     setLoading(false);
   }, []);
+
+  const checkIfFirstLaunch = async () => {
+    try {
+      const hasLaunched = await AsyncStorage.getItem(data.HAS_LAUNCHED);
+      if (hasLaunched === null) {
+        AsyncStorage.setItem(data.HAS_LAUNCHED, 'true');
+        setFirstLaunch(true);
+      } else {
+        setFirstLaunch(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const setTheme = async (newTheme: string) => {
     try {
@@ -90,7 +112,11 @@ const App = () => {
     <ThemeContext.Provider value={value}>
       <StatusBar barStyle="light-content" backgroundColor="black" />
       <SafeAreaProvider>
-        <Navigation />
+        {isFirstLaunch ? (
+          <StartSlides onDone={() => setFirstLaunch(false)} />
+        ) : (
+          <Navigation />
+        )}
       </SafeAreaProvider>
     </ThemeContext.Provider>
   );

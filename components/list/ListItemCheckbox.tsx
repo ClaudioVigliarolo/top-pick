@@ -28,7 +28,9 @@ const ListItemCheckBox = (props: ListItemCheckBoxProps) => {
   return (
     <ListItem style={styles.container} onPress={props.onPress}>
       <View style={styles.textContainer}>
-        <Text style={{color: Colors[theme].primaryText}}>{props.text}</Text>
+        <Text style={{color: Colors[theme].primaryText}}>
+          {props.text.replace(/\s+/g, ' ').trim()}
+        </Text>
       </View>
       <Right style={{position: 'absolute', right: '10%'}}>
         <CheckBox

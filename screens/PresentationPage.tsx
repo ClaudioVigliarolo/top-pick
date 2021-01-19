@@ -21,6 +21,7 @@ export default function PresentationPage({
         textColor={Colors[theme].whiteText}
         title={topic}
         items={questions}
+        image={null}
         onClose={() => {
           navigation.goBack();
         }}

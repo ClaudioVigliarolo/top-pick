@@ -9,7 +9,6 @@ import {
 import {Text, View, StyleSheet, Image} from 'react-native';
 import Dimensions from '../../constants/Dimensions';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-
 interface Question {
   name: string;
   selected: boolean;
@@ -20,6 +19,7 @@ interface SliderProps {
   textColor: string;
   title: string;
   items: Question[];
+  image: Image | null;
   onClose(): void;
 }
 
@@ -91,7 +91,7 @@ const Slider = (props: SliderProps) => {
       height: 10,
       width: 10,
       borderRadius: 10 / 2,
-      backgroundColor: 'red',
+      backgroundColor: '#fff',
       marginLeft: 10,
     },
     titleSection: {
@@ -148,7 +148,7 @@ const Slider = (props: SliderProps) => {
             <View
               style={[
                 styles.paginationDots,
-                {opacity: pageIndex === index ? 1 : 0.5},
+                {opacity: pageIndex === index ? 0.8 : 0.2},
               ]}
               key={index}
             />
