@@ -1,13 +1,13 @@
 	SELECT c.topic_title,
-	FROM category_topics c
+	from category_topics${translations.DB_NAME} c
 	WHERE category_title = “,,,”
 
 
 
 SELECT t.title
-FROM topics t
+${translations.DB_NAME} t
 WHERE t.title IN(
     SELECT c.topic
-    FROM category_topics c
+    from category_topics${translations.DB_NAME} c
     WHERE c.category = ${category}
 )

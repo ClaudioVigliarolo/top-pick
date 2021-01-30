@@ -1,16 +1,13 @@
-
 CREATE TABLE "categories" (
-	"topic"	TEXT,
 	"title"	TEXT,
-	FOREIGN KEY("topic") REFERENCES "topics"("title"),
 	PRIMARY KEY("title")
 );
 
 
 CREATE TABLE "topics" (
 	"title"	TEXT,
+    "source" TEXT,
 	PRIMARY KEY("title")
-
 );
 
 

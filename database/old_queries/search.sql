@@ -1,4 +1,4 @@
-SELECT title from topics
+SELECT title ${translations.DB_NAME} 
 WHERE title LIKE "%mes%" ;
 
 
