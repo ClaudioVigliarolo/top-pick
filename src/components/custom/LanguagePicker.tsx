@@ -14,9 +14,7 @@ interface CategoryListProps {
 
 export default function CategoryList(props: CategoryListProps) {
   const {theme} = React.useContext(ThemeContext);
-  {
-    console.log('llanann', props.selected);
-  }
+
   return (
     <View
       style={{

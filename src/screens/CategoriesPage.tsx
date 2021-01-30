@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {StyleSheet, Alert, ScrollView} from 'react-native';
+import {Category} from '../interfaces/Interfaces';
 import {getColor} from '../constants/Themes';
 import {getTranslatedCategory} from '../context/categoryTranslator';
 import ThemeContext from '../context/ThemeContext';
@@ -16,12 +17,6 @@ const db = SQLite.openDatabase(
   () => {},
   () => {},
 );
-
-interface Category {
-  title: string;
-  value: string;
-  counter: number;
-}
 
 export default function CategoryList({navigation}: {navigation: any}) {
   const [items, setItems] = React.useState<Category[]>([]);

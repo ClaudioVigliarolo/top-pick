@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {StyleSheet, Alert, View, ScrollView} from 'react-native';
 import {List, Text} from 'native-base';
+import {Question} from '../interfaces/Interfaces';
 import {getColor} from '../constants/Themes';
 import ListItemDrag from '../components/list/ListItemDrag';
 import DraggableFlatList from 'react-native-draggable-flatlist';
@@ -19,13 +20,6 @@ const db = SQLite.openDatabase(
   () => {},
   () => {},
 );
-
-interface Question {
-  id: number;
-  title: string;
-  selected: boolean;
-  liked: boolean;
-}
 
 export default function CategoryList({navigation}: {navigation: any}) {
   const [items, setItems] = React.useState<Question[]>([]);

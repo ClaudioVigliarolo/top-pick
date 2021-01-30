@@ -1,15 +1,10 @@
 import * as React from 'react';
 import {View, StyleSheet} from 'react-native';
 import ThemeContext from '../../context/ThemeContext';
-
+import {Topic} from '../../interfaces/Interfaces';
 import {Text, Button} from 'native-base';
 import {getColor} from '../../constants/Themes';
 import Dimensions from '../../constants/Dimensions';
-
-interface Topic {
-  title: string;
-  value: string;
-}
 
 interface ButtonsSectionProps {
   header: string;

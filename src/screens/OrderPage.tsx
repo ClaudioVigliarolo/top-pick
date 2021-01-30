@@ -7,6 +7,7 @@ import {
   Alert,
   PermissionsAndroid,
 } from 'react-native';
+import {Question, Topic} from '../interfaces/Interfaces';
 import {getColor} from '../constants/Themes';
 import {LocalizationContext} from '../context/LocalizationContext';
 import FileViewer from 'react-native-file-viewer';
@@ -32,18 +33,6 @@ const db = SQLite.openDatabase(
   () => {},
   () => {},
 );
-
-interface Question {
-  id: number;
-  title: string;
-  selected: boolean;
-  liked: boolean;
-}
-
-interface Topic {
-  title: string;
-  value: string;
-}
 
 export default function OrderPage({
   route,

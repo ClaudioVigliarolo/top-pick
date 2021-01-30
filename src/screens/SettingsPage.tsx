@@ -29,13 +29,6 @@ const db = SQLite.openDatabase(
   () => {},
 );
 
-interface Item {
-  id: number;
-  title: string;
-  selected: boolean;
-  liked: boolean;
-}
-
 export default function CategoryList({navigation}: {navigation: any}) {
   const [isAlert, setAlert] = React.useState<boolean>(false);
   const {translations, appLanguage, setAppLanguage} = React.useContext(
@@ -43,7 +36,6 @@ export default function CategoryList({navigation}: {navigation: any}) {
   );
 
   const handleSetLanguage = async (language: string) => {
-    console.log('handdddle');
     setAppLanguage(language);
   };
 

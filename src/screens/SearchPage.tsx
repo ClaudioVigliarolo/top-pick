@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import SearchBar from '../components/search/SearchBar';
 import {getColor} from '../constants/Themes';
 import {LocalizationContext} from '../context/LocalizationContext';
-import Dimensions from '../constants/Dimensions';
+import {Topic} from '../interfaces/Interfaces';
 import CardItem from '../components/list/CardItem';
 import ButtonsSection from '../components/buttons/ButtonsSearchSection';
 import data from '../../database/keys/keys';
@@ -21,11 +21,6 @@ const db = SQLite.openDatabase(
   () => {},
   () => {},
 );
-
-interface Topic {
-  title: string;
-  value: string;
-}
 
 const MAX_RECENTS = 3;
 const MAX_POPULAR = 6;
@@ -184,7 +179,11 @@ const SearchPage = ({navigation}: {navigation: any}) => {
               color={getColor(theme, 'primaryOrange')}
               type="topic"
               onPress={() => {
-                goQuestionsFromTopic(title);
+                const topic: Topic = {
+                  title,
+                  value: getTranslatedTopic(title, translations.DB_NAME),
+                };
+                goQuestionsFromTopic(topic);
                 onChangeRecents(title);
                 setText('');
               }}

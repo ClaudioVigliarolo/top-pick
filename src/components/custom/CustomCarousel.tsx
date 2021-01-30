@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Text, View, StyleSheet, Alert, Dimensions as Dim} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {Topic} from '../../interfaces/Interfaces';
 import Carousel from 'react-native-snap-carousel'; // Version can be specified in package.json
 import ThemeContext from '../../context/ThemeContext';
 import {getColor} from '../../constants/Themes';
@@ -10,11 +11,6 @@ import {scrollInterpolator, animatedStyles} from '../../utils/animations';
 
 //const ITEM_HEIGHT = Math.round((ITEM_WIDTH * 4) / 4);
 const colorsData = require('../../constants/card_templates.json');
-
-interface Topic {
-  title: string;
-  value: string;
-}
 
 interface CarouselProps {
   carouselItems: Topic[];

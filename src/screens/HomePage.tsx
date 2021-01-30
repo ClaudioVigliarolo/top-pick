@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {View, SafeAreaView, Alert} from 'react-native';
 import ThemeContext from '../context/ThemeContext';
+import {Topic} from '../interfaces/Interfaces';
 import {LocalizationContext} from '../context/LocalizationContext';
 import TopicsCarousel from '../components/custom/CustomCarousel';
 import Button from '../components/buttons/CustomButton';
@@ -8,11 +9,6 @@ import Dimensions from '../constants/Dimensions';
 import {getColor} from '../constants/Themes';
 import {getTranslatedTopic} from '../context/topicTranslator';
 import SQLite from 'react-native-sqlite-storage';
-
-interface Topic {
-  title: string;
-  value: string;
-}
 
 const db = SQLite.openDatabase(
   {
@@ -37,12 +33,13 @@ const HomePage = ({navigation}: {navigation: any}) => {
   );
 
   React.useEffect(() => {
+    configureLanguage();
+    setCarouselItems([]);
+    console.log('why', translations.DB_NAME);
     loadTopics(INITIALS_TOPICS_LOADED);
-  }, []);
+  }, [translations.DB_NAME]);
 
   const loadTopics = async (n: number): Promise<void> => {
-    configureLanguage();
-
     db.transaction((tx) => {
       tx.executeSql(
         `SELECT title from topics${translations.DB_NAME}

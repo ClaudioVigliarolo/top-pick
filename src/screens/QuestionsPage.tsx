@@ -7,6 +7,7 @@ import {
   LayoutAnimation,
 } from 'react-native';
 import ThemeContext from '../context/ThemeContext';
+import {Question} from '../interfaces/Interfaces';
 import {LocalizationContext} from '../context/LocalizationContext';
 import {getColor} from '../constants/Themes';
 import ListItem from '../components/list/ListItemCheckbox';
@@ -26,13 +27,6 @@ const db = SQLite.openDatabase(
 );
 
 let _listViewOffset = 0;
-
-interface Question {
-  id: number;
-  title: string;
-  selected: boolean;
-  liked: boolean;
-}
 
 export default function QuestionsPage({
   route,

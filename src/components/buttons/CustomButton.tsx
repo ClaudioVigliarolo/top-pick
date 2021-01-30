@@ -2,8 +2,6 @@ import * as React from 'react';
 import {Text, View, StyleSheet, TouchableOpacity} from 'react-native';
 import ThemeContext from '../../context/ThemeContext';
 
-interface CustomButtonProps {}
-
 const CustomButton = ({
   onPress,
   title,

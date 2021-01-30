@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {Text, View, StyleSheet} from 'react-native';
 import ThemeContext from '../context/ThemeContext';
+import {Question, Topic} from '../interfaces/Interfaces';
 import {getColor} from '../constants/Themes';
-import Dimensions from '../constants/Dimensions';
 import Slider from '../components/custom/Slider';
 
 export default function PresentationPage({
@@ -19,7 +19,7 @@ export default function PresentationPage({
       <Slider
         backgroundColor={getColor(theme, 'primaryOrange')}
         textColor={'#fff'}
-        title={topic}
+        title={topic.value}
         items={questions}
         image={null}
         onClose={() => {

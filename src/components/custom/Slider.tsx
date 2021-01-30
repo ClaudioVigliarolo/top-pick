@@ -6,13 +6,10 @@ import {
   StatusBar,
   Dimensions as Dim,
 } from 'react-native';
+import {Question} from '../../interfaces/Interfaces';
 import {Text, View, StyleSheet, Image} from 'react-native';
 import Dimensions from '../../constants/Dimensions';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-interface Question {
-  name: string;
-  selected: boolean;
-}
 
 interface SliderProps {
   backgroundColor: string;

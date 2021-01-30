@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {StyleSheet, Alert, ScrollView} from 'react-native';
-import {List, Text} from 'native-base';
+import {Topic, Category} from '../interfaces/Interfaces';
 import {LocalizationContext} from '../context/LocalizationContext';
 import ThemeContext from '../context/ThemeContext';
 import {getColor} from '../constants/Themes';
@@ -18,17 +18,6 @@ const db = SQLite.openDatabase(
   () => {},
   () => {},
 );
-
-interface Topic {
-  title: string;
-  value: string;
-}
-
-interface Category {
-  title: string;
-  value: string;
-  counter: number;
-}
 
 export default function TopicsPage({
   route,

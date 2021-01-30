@@ -4,7 +4,6 @@ import {View} from 'react-native';
 import {getColor} from '../../constants/Themes';
 import Dimensions from '../../constants/Dimensions';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import Entypo from 'react-native-vector-icons/Entypo';
 const renderIcon = (name: string, isCurrent: boolean, theme: string): any => {
   switch (name) {
     case 'Home':
