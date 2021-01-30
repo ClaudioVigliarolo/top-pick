@@ -1,35 +1,30 @@
 import React from 'react';
-import {StatusBar, View} from 'react-native';
+import {StatusBar} from 'react-native';
+import {MenuProvider} from 'react-native-popup-menu';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import ThemeContext from './context/ThemeContext';
+import ThemeContext from './src/context/ThemeContext';
 import AsyncStorage from '@react-native-community/async-storage';
-import Navigation from './navigation';
+import Navigation from './src/navigation';
 import RNBootSplash from 'react-native-bootsplash';
-import data from './database/keys';
-import SQLite, {
-  ResultSet,
-  SQLiteDatabase,
-  Transaction,
-} from 'react-native-sqlite-storage';
-import StartSlides from './startSlides/StartSlider';
-
-const db = SQLite.openDatabase(
-  {
-    name: 'db.db',
-    location: 'default',
-    createFromLocation: 1,
-  },
-  () => {},
-  () => {},
-);
+import data from './database/keys/keys';
+import {LocalizationContext} from './src/context/LocalizationContext';
+import StartSlides from './src/startSlides/StartSlider';
+import {LocalizationProvider} from './src/context/LocalizationContext';
 
 // 0: loading, 1: already launched, 2: firstLaunch
 
 const App = () => {
   const [loading, setLoading] = React.useState(true);
   const [theme, setStateTheme] = React.useState('light');
-  const [isFirstLaunch, setFirstLaunch] = React.useState(false);
+  const {
+    translations,
+    appLanguage,
+    configureLanguage,
+    setAppLanguage,
+  } = React.useContext(LocalizationContext);
 
+  const [language, setLanguage] = React.useState('');
+  const [isFirstLaunch, setFirstLaunch] = React.useState(false);
   const readTheme = async () => {
     try {
       const theme = await AsyncStorage.getItem(data.THEME_KEY);
@@ -47,19 +42,18 @@ const App = () => {
     (async () => {
       readTheme();
     })();
+    (async () => {
+      configureLanguage();
+    })();
 
     (async () => {
       checkIfFirstLaunch();
     })();
 
     (async () => {
-      loadDB();
+      await RNBootSplash.hide({fade: true});
     })();
 
-    (async () => {
-      await RNBootSplash.hide({fade: true});
-      console.log('Bootsplash has been hidden successfully');
-    })();
     setLoading(false);
   }, []);
 
@@ -81,43 +75,26 @@ const App = () => {
     try {
       setStateTheme(newTheme);
       await AsyncStorage.setItem(data.THEME_KEY, newTheme);
-      console.log('Data successfully saved');
-    } catch (e) {
-      console.log('Failed to save the data to the storage');
-    }
+    } catch (e) {}
   };
 
-  const loadDB = () => {
-    console.log('calling useEffect');
-    db.transaction((tx: Transaction) => {
-      tx.executeSql(
-        'SELECT * FROM categories;',
-        [],
-        (tx: Transaction, results: ResultSet) => {
-          const rows = results.rows;
-          let users = [];
-          for (let i = 0; i < rows.length; i++) {
-            users.push({
-              ...rows.item(i),
-            });
-          }
-        },
-      );
-    });
-  };
-  const value = {theme, setTheme};
-
+  const themeVal = {theme, setTheme};
   if (loading) return null;
+
   return (
-    <ThemeContext.Provider value={value}>
+    <ThemeContext.Provider value={themeVal}>
       <StatusBar barStyle="light-content" backgroundColor="black" />
-      <SafeAreaProvider>
-        {isFirstLaunch ? (
-          <StartSlides onDone={() => setFirstLaunch(false)} />
-        ) : (
-          <Navigation />
-        )}
-      </SafeAreaProvider>
+      <MenuProvider>
+        <LocalizationProvider>
+          <SafeAreaProvider>
+            {isFirstLaunch ? (
+              <StartSlides onDone={() => setFirstLaunch(false)} />
+            ) : (
+              <Navigation />
+            )}
+          </SafeAreaProvider>
+        </LocalizationProvider>
+      </MenuProvider>
     </ThemeContext.Provider>
   );
 };
