@@ -31,6 +31,7 @@ const CustomListItem = (props: CustomListItemProps) => {
         style={{
           color: getColor(theme, 'primaryText'),
           fontSize: Dimensions.fontList,
+          textTransform: 'capitalize',
         }}>
         {props.text.replace(/\s+/g, ' ').trim()}
       </Text>
@@ -39,6 +40,7 @@ const CustomListItem = (props: CustomListItemProps) => {
           color: getColor(theme, 'lightGray'),
           position: 'absolute',
           right: '20%',
+          textTransform: 'capitalize',
         }}>
         {props.secondaryText}
       </Text>

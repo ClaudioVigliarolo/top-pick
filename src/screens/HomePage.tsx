@@ -34,8 +34,7 @@ const HomePage = ({navigation}: {navigation: any}) => {
 
   React.useEffect(() => {
     configureLanguage();
-    setCarouselItems([]);
-    console.log('why', translations.DB_NAME);
+    setCarouselItems(carouselItems.splice(0, carouselItems.length));
     loadTopics(INITIALS_TOPICS_LOADED);
   }, [translations.DB_NAME]);
 
@@ -57,8 +56,8 @@ const HomePage = ({navigation}: {navigation: any}) => {
             newArr.push({
               ...rows.item(i),
             });
-            console.log('99', rows.item(2));
           }
+          console.log('setting new items');
           setCarouselItems([...newArr]);
         },
       );

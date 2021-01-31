@@ -4,8 +4,8 @@ import {getColor} from '../../constants/Themes';
 import DropDownPicker from 'react-native-dropdown-picker';
 import ThemeContext from '../../context/ThemeContext';
 import Dimensions from '../../constants/Dimensions';
-import Icon from 'react-native-vector-icons/Feather';
 
+const DEFAULT_TEXT = 'App language: ';
 interface CategoryListProps {
   title: string;
   onLanguageChange(newLang: string): void;
@@ -13,6 +13,7 @@ interface CategoryListProps {
 }
 
 export default function CategoryList(props: CategoryListProps) {
+  const [text, setText] = React.useState<string>(DEFAULT_TEXT);
   const {theme} = React.useContext(ThemeContext);
 
   return (
@@ -24,38 +25,31 @@ export default function CategoryList(props: CategoryListProps) {
       <DropDownPicker
         items={[
           {
-            label: 'English',
+            label: text + 'English',
             value: 'en',
             selected: props.selected == 'en',
-            icon: () => <Icon name="flag" size={18} color="#900" />,
+            // icon: () => <Icon name="flag" size={18} color="#900" />,
           },
           {
-            label: 'Italiano',
+            label: text + 'Italiano',
             value: 'it',
             selected: props.selected == 'it',
-            icon: () => <Icon name="flag" size={18} color="#900" />,
-          },
-          {
-            label: 'Deutsch',
-            value: 'de',
-            selected: props.selected == 'de',
-            icon: () => <Icon name="flag" size={18} color="#900" />,
+            //  icon: () => {if(props.selected == 'it') <Icon name="flag" size={18} color="#900" />},
           },
         ]}
         style={{
           backgroundColor: getColor(theme, 'primaryBackground'),
           borderWidth: 0,
-
-          //  marginLeft: '-4%',
         }}
-        placeholder={props.title}
+        placeholder={text + props.title}
         //selectedLabelStyle={{color: getColor(theme, 'primaryOrange')}}
         placeholderStyle={{color: '#fff'}}
         containerStyle={{height: 40}}
         labelStyle={{
-          color: getColor(theme, 'primaryText'),
+          color: '#fff',
           fontSize: Dimensions.fontList,
         }}
+        onOpen={() => setText(text.replace(DEFAULT_TEXT, ''))}
         dropDownStyle={{
           backgroundColor: getColor(theme, 'primaryHeaderBackground'),
           borderWidth: 0,

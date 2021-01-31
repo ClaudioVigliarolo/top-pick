@@ -15,9 +15,9 @@ import {View, StyleSheet, TouchableWithoutFeedback, Alert} from 'react-native';
 import {getColor} from '../../constants/Themes';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LikeIcon from 'react-native-vector-icons/AntDesign';
-
 import Dimensions from '../../constants/Dimensions';
 import {TextInput} from 'react-native-gesture-handler';
+import AwesomeAlert from 'react-native-awesome-alerts';
 
 interface CustomListItemProps {
   id: number;
@@ -29,14 +29,14 @@ interface CustomListItemProps {
   onDrag(): void;
   onLike(id: number): void;
   onRemove(id: number): void;
-  onChangeText(text: string, id: number): void;
+  onEdit(id: number, text: string): void;
   number: number;
 }
 
 const CustomListItem = (props: CustomListItemProps) => {
   let _menu = React.useRef(null);
   const {theme} = React.useContext(ThemeContext);
-  const [isEditing, setEdit] = React.useState<boolean>(false);
+  const [isAlert, setAlert] = React.useState<boolean>(false);
 
   const setMenuRef = (ref: any) => {
     _menu = ref;
@@ -75,7 +75,7 @@ const CustomListItem = (props: CustomListItemProps) => {
           <MenuItem
             onPress={() => {
               hideMenu();
-              setEdit(true);
+              props.onEdit(props.id, props.text);
             }}>
             Edit
           </MenuItem>
@@ -96,61 +96,44 @@ const CustomListItem = (props: CustomListItemProps) => {
           styles.container,
           {backgroundColor: props.backgroundColor, opacity: props.opacity},
         ]}>
-        {!isEditing && (
-          <View style={styles.numberContainer}>
-            <Text
-              style={{
-                color: getColor(theme, 'primaryText'),
-                textAlignVertical: 'center',
-                fontWeight: 'bold',
-              }}>
-              {props.number}
-            </Text>
-          </View>
-        )}
-
-        <View style={styles.textContainer}>
-          {!isEditing && (
-            <Text
-              style={{
-                color: getColor(theme, 'primaryText'),
-                textAlignVertical: 'center',
-                textAlign: 'left',
-              }}>
-              {props.text.replace(/^\s+/g, '')}
-            </Text>
-          )}
-
-          {isEditing && (
-            <View style={styles.overlay}>
-              <TextInput
-                style={styles.editing}
-                multiline={true}
-                value={props.text}
-                onChangeText={(text) => props.onChangeText(text, props.id)}
-              />
-            </View>
-          )}
+        <View style={styles.numberContainer}>
+          <Text
+            style={{
+              color: getColor(theme, 'primaryText'),
+              textAlignVertical: 'center',
+              fontWeight: 'bold',
+            }}>
+            {props.number}
+          </Text>
         </View>
 
-        {!isEditing && (
-          <View style={styles.iconContainer}>
-            <LikeIcon
-              name={props.liked ? 'heart' : 'hearto'}
-              color={getColor(theme, 'primaryOrange')}
-              size={Dimensions.iconMedSmall}
-              onPress={() => props.onLike(props.id)}
-              style={{marginRight: 5}}
+        <View style={styles.textContainer}>
+          <Text
+            style={{
+              color: getColor(theme, 'primaryText'),
+              textAlignVertical: 'center',
+              marginRight: 'auto',
+            }}>
+            {props.text.replace(/^\s+/g, '')}
+          </Text>
+        </View>
+
+        <View style={styles.iconContainer}>
+          <LikeIcon
+            name={props.liked ? 'heart' : 'hearto'}
+            color={getColor(theme, 'primaryOrange')}
+            size={Dimensions.iconMedSmall}
+            onPress={() => props.onLike(props.id)}
+            style={{marginRight: 5}}
+          />
+          <TouchableWithoutFeedback onPressIn={props.onDrag}>
+            <Icon
+              name="drag"
+              color={getColor(theme, 'lightGray')}
+              size={Dimensions.iconMed}
             />
-            <TouchableWithoutFeedback onPressIn={props.onDrag}>
-              <Icon
-                name="drag"
-                color={getColor(theme, 'lightGray')}
-                size={Dimensions.iconMed}
-              />
-            </TouchableWithoutFeedback>
-          </View>
-        )}
+          </TouchableWithoutFeedback>
+        </View>
       </ListItem>
     </View>
   );
@@ -167,8 +150,10 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 9,
+    flexDirection: 'row',
     height: '100%',
     padding: 0,
+    textAlign: 'left',
   },
   numberContainer: {
     margin: 5,

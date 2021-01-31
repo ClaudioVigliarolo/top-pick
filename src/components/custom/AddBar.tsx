@@ -5,6 +5,9 @@ import {getColor} from '../../constants/Themes';
 import IconBack from 'react-native-vector-icons/MaterialIcons';
 import Dimensions from '../../constants/Dimensions';
 import IconAdd from 'react-native-vector-icons/Ionicons';
+
+const MIN_QUESTION_LEN = 5;
+
 interface AddBarProps {
   text: string;
   placeholder: string;
@@ -30,15 +33,19 @@ const AddBar = (props: AddBarProps) => {
             color={getColor(theme, 'searchIconColor')}
           />
           <Input
-            onChangeText={props.setText} // <-- Here
+            onChangeText={props.setText}
             placeholder={props.placeholder}
             value={props.text}
             style={{color: getColor(theme, 'barTextColor')}}
-            onSubmitEditing={() => props.onAdd()}
+            onSubmitEditing={() => {
+              if (props.text.length < MIN_QUESTION_LEN) return false;
+              props.onAdd();
+              props.setText('');
+            }}
           />
           <IconBack
             name="cancel"
-            color={getColor(theme, 'searchBarIcon')}
+            color={getColor(theme, 'searchIconColor')}
             size={Dimensions.iconCancelBar}
             style={{padding: 5}}
             onPress={() => props.setText('')}

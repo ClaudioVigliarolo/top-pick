@@ -17,13 +17,12 @@ import ThemeContext from '../context/ThemeContext';
 import ListItemDrag from '../components/list/ListItemDrag';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import BottomsDownToUp from '../components/buttons/BottomsDownToUp';
-import AddSection from '../components/custom/AddSection';
 import AddBar from '../components/custom/AddBar';
 
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import SQLite from 'react-native-sqlite-storage';
+import EditOverlay from '../components/custom/EditOverlay';
 
-const MIN_QUESTION_LEN = 5;
 const db = SQLite.openDatabase(
   {
     name: 'db.db',
@@ -33,6 +32,43 @@ const db = SQLite.openDatabase(
   () => {},
   () => {},
 );
+
+const getQuestionHtml = (items: Question[]) => {
+  const htmlContent = `
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pdf Content</title>
+        <style>
+            body {
+                font-size: 16px;
+                color: black;
+            }
+            h3 {
+                text-align: center;
+              font-weight:fold;
+            }
+            li{
+                padding:8px;
+            }
+        </style>
+    </head>
+    <body>
+        <h3>Topic Title</h3>
+        <div style="margin-top:50px">
+          <ol>
+            ${items
+              .map((item: Question) => ' <li>' + item.title + '</li>')
+              .join('\n')}
+          </ol> 
+        </div>
+    </body>
+  </html>
+`;
+  return htmlContent;
+};
 
 export default function OrderPage({
   route,
@@ -45,12 +81,19 @@ export default function OrderPage({
     questions,
     topic,
   }: {questions: Question[]; topic: Topic} = route.params;
-  const [newQuestion, setNewQuestion] = React.useState('');
+  const [questionText, setQuestionText] = React.useState('');
+  //id of the question being edited. -1 is the default meaning no question is being edited
+  const [questionId, setQuestionId] = React.useState<number>(-1);
   const [items, setItems] = React.useState<Question[]>([]);
   const [isMenuOptionShown, showMenuOption] = React.useState<boolean>(false);
+  const [isEditing, setEditing] = React.useState<boolean>(false);
   const {theme} = React.useContext(ThemeContext);
   const {translations} = React.useContext(LocalizationContext);
   let actionSheet = React.useRef<HTMLInputElement>();
+
+  React.useEffect(() => {
+    setItems(questions);
+  }, [questions]);
 
   const onRemove = (id: number) => {
     const newItems = [...items];
@@ -59,11 +102,14 @@ export default function OrderPage({
     setItems(newItems.slice());
   };
 
-  const onChangeTextListItem = (id: number, newText: string) => {
-    const newItems = [...items];
+  const onEdit = (id: number, newText: string) => {
+    setEditing(true);
+    setQuestionText(newText);
+    setQuestionId(id);
+    /* const newItems = [...items];
     const index = newItems.findIndex((item) => item.id == id);
     newItems[index].title = newText;
-    setItems(newItems.slice());
+    setItems(newItems.slice()); */
   };
 
   const renderItem = ({
@@ -79,7 +125,7 @@ export default function OrderPage({
   }) => {
     return (
       <ListItemDrag
-        onChangeText={onChangeTextListItem}
+        onEdit={onEdit}
         onRemove={onRemove}
         onDrag={drag}
         number={index + 1}
@@ -94,12 +140,34 @@ export default function OrderPage({
     );
   };
 
+  const onEditFinish = (editedQuestion: string, questionId: number) => {
+    const newItems = [...items];
+    const index = newItems.findIndex((item) => item.id == questionId);
+    if (index != -1) {
+      newItems[index].title = editedQuestion;
+      //update question in db
+      db.transaction((tx) => {
+        tx.executeSql(
+          `UPDATE "questions${translations.DB_NAME}"
+          SET title = "${editedQuestion}"
+          WHERE "id" = ${questionId}`,
+          [],
+          (tx, results) => {
+            setItems(newItems.slice());
+          },
+          (err) => {
+            console.log(err);
+          },
+        );
+      });
+    }
+  };
+
   const onQuestionAdd = () => {
-    if (newQuestion.length < MIN_QUESTION_LEN) return false;
     db.transaction((tx) => {
       tx.executeSql(
         `INSERT INTO "questions${translations.DB_NAME}"
-         VALUES (null, "${topic.title}", "${newQuestion}", 0)`,
+         VALUES (null, "${topic.title}", "${questionText}", 0)`,
         [],
         (tx, results) => {
           const question_id = results.insertId;
@@ -107,7 +175,7 @@ export default function OrderPage({
             id: question_id,
             liked: false,
             selected: false,
-            title: newQuestion,
+            title: questionText,
           };
           console.log(newQuestionItem);
           const newArray = [newQuestionItem].concat(items);
@@ -182,13 +250,9 @@ export default function OrderPage({
     translations.CLOSE,
   ];
 
-  React.useEffect(() => {
-    setItems(questions);
-  }, [questions]); // Only re-run the effect if count changes
-
   const goPresentation = (): void => {
     navigation.navigate('Presentation', {
-      questions: questions,
+      questions: items,
       topic,
     });
   };
@@ -196,7 +260,7 @@ export default function OrderPage({
   const handleButtons = (functionName: string): void => {
     switch (functionName) {
       case translations.EXPORT_TO_PDF:
-        createPDF(htmlContent);
+        createPDF(getQuestionHtml(items));
         break;
 
       case translations.START_PRESENTATION:
@@ -209,51 +273,19 @@ export default function OrderPage({
     }
   };
 
-  const htmlContent = `
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Pdf Content</title>
-        <style>
-            body {
-                font-size: 16px;
-                color: black;
-            }
-            h3 {
-                text-align: center;
-              font-weight:fold;
-            }
-            li{
-                padding:8px;
-            }
-        </style>
-    </head>
-    <body>
-        <h3>Topic Title</h3>
-        <div style="margin-top:50px">
-          <ol>
-            ${questions
-              .map((question) => ' <li>' + question.title + '</li>')
-              .join('\n')}
-          </ol> 
-        </div>
-    </body>
-  </html>
-`;
   return (
     <View
       style={{
         flex: 1,
         flexDirection: 'column',
+        position: 'relative',
         justifyContent: 'center',
         backgroundColor: getColor(theme, 'primaryBackground'),
       }}>
       <AddBar
         placeholder={translations.ADD_YOUR_QUESTION}
-        setText={setNewQuestion}
-        text={newQuestion}
+        setText={setQuestionText}
+        text={questionText}
         onAdd={onQuestionAdd}
       />
       <DraggableFlatList
@@ -267,7 +299,7 @@ export default function OrderPage({
         onPress={() => {
           actionSheet.current.show();
         }}
-        text={translations.READY}
+        text={translations.READY_TO_TALK}
         isButtonEnabled={true}
         isTextEnabled={false}
         visible={true}
@@ -284,6 +316,21 @@ export default function OrderPage({
         }}
         title={translations.IS_TIME}
         onHide={() => actionSheet.current.hide()}
+      />
+      <EditOverlay
+        onChangeText={setQuestionText}
+        text={questionText}
+        onSubmit={() => {
+          Alert.alert('ss');
+          setEditing(false);
+          setQuestionText('');
+          onEditFinish(questionText, questionId);
+        }}
+        onClose={() => {
+          setEditing(false);
+          setQuestionText('');
+        }}
+        isVisible={isEditing}
       />
     </View>
   );

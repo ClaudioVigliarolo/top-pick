@@ -50,6 +50,7 @@ const Slider = (props: SliderProps) => {
       paddingTop: '20%',
       justifyContent: 'flex-start',
       alignItems: 'center',
+      padding: 5,
       textAlignVertical: 'center',
     },
     title: {

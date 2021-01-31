@@ -6,11 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import {List, Text} from 'native-base';
 import {getColor} from '../constants/Themes';
 import {LocalizationContext} from '../context/LocalizationContext';
-import ListItemDrag from '../components/list/ListItemDrag';
-import DraggableFlatList from 'react-native-draggable-flatlist';
 import ThemeContext from '../context/ThemeContext';
 import Dimensions from '../constants/Dimensions';
 import ListItem from '../components/list/ListItem';
