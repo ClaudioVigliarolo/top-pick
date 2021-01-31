@@ -5,12 +5,12 @@ import AsyncStorage from '@react-native-community/async-storage';
 import SearchBar from '../components/search/SearchBar';
 import {getColor} from '../constants/Themes';
 import {LocalizationContext} from '../context/LocalizationContext';
-import {Topic} from '../interfaces/Interfaces';
+import {Topic, Topics} from '../interfaces/Interfaces';
 import CardItem from '../components/list/CardItem';
 import ButtonsSection from '../components/buttons/ButtonsSearchSection';
 import data from '../../database/keys/keys';
 import SQLite from 'react-native-sqlite-storage';
-import {getTranslatedTopic} from '../context/topicTranslator';
+import {getTranslatedTopic, getCurrentTopics} from '../context/topicTranslator';
 
 const db = SQLite.openDatabase(
   {
@@ -38,7 +38,7 @@ const SearchPage = ({navigation}: {navigation: any}) => {
   React.useEffect(() => {
     getRecents();
     getPopular();
-  }, []);
+  }, [translations.DB_NAME]);
 
   const goQuestionsFromTopic = (topic: Topic): void => {
     navigation.navigate('Questions', {
@@ -123,28 +123,43 @@ const SearchPage = ({navigation}: {navigation: any}) => {
   };
 
   const executeSearch = (param: string): void => {
+    console.log('paramm', param);
     if (param == '') {
       setItems([]);
       return;
     }
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT title from topics
-        WHERE title LIKE "%${param}%"
-        LIMIT 3;`,
+    const topics: Topics = getCurrentTopics(translations.DB_NAME);
+    console.log('resss', topics);
+    console.log(typeof topics);
+    // const result = topics.filter((topic) => {});
+    // setItems(result.slice(0, MAX_RECENTS));
+
+    /*db.transaction((tx) => {
+     tx.executeSql( 
+        `SELECT title from topics${translations.DB_NAME}
+         WHERE title LIKE "%${param}%"
+         LIMIT 3;`,
         [],
         (tx, results) => {
           const rows = results.rows;
           let newArr = [];
+          console.log('!!!!!!');
           for (let i = 0; i < rows.length; i++) {
+            rows.item(i).value = getTranslatedTopic(
+              rows.item(i).title,
+              translations.DB_NAME,
+            );
             newArr.push({
               ...rows.item(i),
             });
           }
           setItems(newArr);
         },
+        (err) => {
+          console.log('myerr', err);
+        },
       );
-    });
+    });*/
   };
 
   const styles = StyleSheet.create({

@@ -1,75 +1,12 @@
 
-export enum Lang {
-    italian = 'IT',
-    english = 'EN',
-  }
+import {Topics, Lang} from '../interfaces/Interfaces';
 
-
-interface Topics{
-    computers : string;
-    easter : string; 
-    disabilities: string; 
-    comics: string; 
-    change: string; 
-    chores: string; 
-    airplanes: string;
-    cheating: string; 
-    clothes: string; 
-    creativity: string; 
-    drugs: string; 
-    art: string;
-    celebrities: string; 
-    death: string; 
-    childhood: string; 
-    education: string; 
-    entertainment: string; 
-    business: string; 
-    body_language: string;   
-    adoption: string; 
-    birthdays: string; 
-    advice: string;
-    conflict: string;
-    diet: string; 
-    books: string; 
-    basketball: string;
-    complaining: string;
-    beauty: string;
-    arguing: string;
-    facebook: string;
-    wishes: string;
-    cities: string; 
-    colors: string;
-    animals: string;
-    disaster: string;
-    anger: string;
-    corruption: string;
-    cars: string;
-    advertising: string;
-    environment: string; 
-    beach: string; 
-    dreams: string; 
-    behaviour: string; 
-    countries: string; 
-    crime: string; 
-    bags: string; 
-    dating: string; 
-    community: string; 
-    children: string; 
-    charity: string; 
-    earthquakes: string; 
-    culture: string; 
-    dangers: string; 
-    conversation: string; 
-    aging: string;  
-   };
-
-
-const italianTopics:Topics={
-        computers : "computers",
+    const italianTopics:Topics={
+        computers : "computer",
         easter : "pasqua",
         disabilities: "disabilità",
         comics: "comics",
-        change: "cambiamento",
+        change: "cambiamenti",
         chores: "faccende domestiche",
         airplanes:"aereo",
         cheating:"imbrogli",
@@ -101,7 +38,7 @@ const italianTopics:Topics={
         animals:"animali",
         disaster:"disastri",
         anger:"rabbia",
-        corruption:"corruzzione",
+        corruption:"corruzione",
         cars:"automobili",
         advertising:"pubblicità",
         environment:"ambiente",
@@ -111,7 +48,7 @@ const italianTopics:Topics={
         countries:"paesi",
         crime:"criminalità",
         bags:"borse",
-        dating:"dating",
+        dating:"appuntamenti",
         community:"comunità",
         children:"bambini",
         charity:"beneficienza",
@@ -124,7 +61,7 @@ const italianTopics:Topics={
 
 
 
-const englishTopics:Topics={
+   const englishTopics:Topics={
     computers : "computers",
     easter : "easter",
     disabilities: "disabilities",
@@ -196,3 +133,16 @@ const englishTopics:Topics={
      }
    };
    
+
+   export const getCurrentTopics=(language:string): Topics=>
+   {
+      switch (language) {
+          case Lang.italian:
+              return italianTopics;
+          case Lang.english:
+              return englishTopics;
+          default:
+              return englishTopics;
+      }
+    };
+    

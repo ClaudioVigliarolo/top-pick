@@ -321,7 +321,6 @@ export default function OrderPage({
         onChangeText={setQuestionText}
         text={questionText}
         onSubmit={() => {
-          Alert.alert('ss');
           setEditing(false);
           setQuestionText('');
           onEditFinish(questionText, questionId);

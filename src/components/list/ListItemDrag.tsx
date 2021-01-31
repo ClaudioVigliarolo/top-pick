@@ -16,8 +16,6 @@ import {getColor} from '../../constants/Themes';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LikeIcon from 'react-native-vector-icons/AntDesign';
 import Dimensions from '../../constants/Dimensions';
-import {TextInput} from 'react-native-gesture-handler';
-import AwesomeAlert from 'react-native-awesome-alerts';
 
 interface CustomListItemProps {
   id: number;
@@ -89,7 +87,7 @@ const CustomListItem = (props: CustomListItemProps) => {
         </Menu>
       </View>
       <ListItem
-        onLongPress={() => showMenu()}
+        onPress={() => showMenu()}
         noIndent={true}
         noBorder={true}
         style={[
