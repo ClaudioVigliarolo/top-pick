@@ -24,11 +24,11 @@ const translations = {
     SOURCE_TOPICS: "fonte:",
     SELECTED : "Selezionati",
     POPULAR_SEARCHES : "Ricerche più popolari",
-    READY_TO_TALK: "Sono Pronto",
+    READY_TO_TALK: "Pronto a Parlare",
     SEARCH_A_TOPIC: "Cerca un Topic",
     SEARCH_IN : "Cerca in",
     DB_NAME : 'IT',
-   START: "Iniziamo!",
+    START: "Iniziamo!",
     STEP_1_TITLE: 'Step 1: Scegli',
     STEP_1_DESCRIPTION:'Premi su una carta per selezionare il topic',
 

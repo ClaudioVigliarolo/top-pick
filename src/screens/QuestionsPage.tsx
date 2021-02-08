@@ -152,7 +152,7 @@ export default function QuestionsPage({
           setFilter(val);
         }}
         text={filter}
-        placeholder={translations.SEARCH_IN + ' ' + topic.value}
+        placeholder={translations.SEARCH_IN + ' ' + topic.title}
         automatic={false}
       />
 

@@ -19,7 +19,7 @@ export default function PresentationPage({
       <Slider
         backgroundColor={getColor(theme, 'primaryOrange')}
         textColor={'#fff'}
-        title={topic.value}
+        title={topic.title}
         items={questions}
         image={null}
         onClose={() => {

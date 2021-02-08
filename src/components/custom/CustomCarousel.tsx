@@ -64,7 +64,7 @@ const TopicCarousel = React.forwardRef((props: CarouselProps, ref) => {
               height: itemHeight,
             },
           ]}>
-          <Text style={styles.itemLabel}>{item.value}</Text>
+          <Text style={styles.itemLabel}>{item.title}</Text>
         </View>
       </TouchableOpacity>
     );

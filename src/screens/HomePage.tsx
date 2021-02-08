@@ -7,7 +7,6 @@ import TopicsCarousel from '../components/custom/CustomCarousel';
 import Button from '../components/buttons/CustomButton';
 import Dimensions from '../constants/Dimensions';
 import {getColor} from '../constants/Themes';
-import {getTranslatedTopic} from '../context/topicTranslator';
 import SQLite from 'react-native-sqlite-storage';
 
 const db = SQLite.openDatabase(
@@ -49,10 +48,6 @@ const HomePage = ({navigation}: {navigation: any}) => {
           const rows = results.rows;
           let newArr = carouselItems;
           for (let i = 0; i < rows.length; i++) {
-            rows.item(i).value = getTranslatedTopic(
-              rows.item(i).title,
-              translations.DB_NAME,
-            );
             newArr.push({
               ...rows.item(i),
             });
@@ -101,7 +96,7 @@ const HomePage = ({navigation}: {navigation: any}) => {
             setCarouselIndex(index);
             getNewTopics(index);
           }}
-          onTopicPress={(topic: string) => goQuestionsPage(topic)}
+          onTopicPress={(topic: Topic) => goQuestionsPage(topic)}
           activeIndex={carouselIndex}
           ref={mycarousel}
           carouselItems={carouselItems}

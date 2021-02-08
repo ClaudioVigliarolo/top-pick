@@ -194,7 +194,7 @@ export default function OrderPage({
         //Content to print
         html: htmlContent,
         //File Name
-        fileName: topic.value,
+        fileName: topic.title,
         //File directory
         directory: 'Top Picks',
       };

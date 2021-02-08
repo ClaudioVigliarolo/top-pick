@@ -58,16 +58,17 @@ export default function CategoryList({navigation}: {navigation: any}) {
   };
 
   const resetDB = (): void => {
-    SQLite.deleteDatabase(
+    /* SQLite.deleteDatabase(
       {name: 'db.db', location: 'default'},
       () => {
         console.log('second db deleted');
-        AsyncStorage.clear();
+        
       },
       () => {
         console.log('ERROR');
       },
-    );
+    );*/
+    AsyncStorage.clear();
   };
 
   return (

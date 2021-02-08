@@ -2,7 +2,6 @@ import * as React from 'react';
 import {StyleSheet, Alert, ScrollView} from 'react-native';
 import {Category} from '../interfaces/Interfaces';
 import {getColor} from '../constants/Themes';
-import {getTranslatedCategory} from '../context/categoryTranslator';
 import ThemeContext from '../context/ThemeContext';
 import {LocalizationContext} from '../context/LocalizationContext';
 import ListItem from '../components/list/ListItem';
@@ -35,10 +34,6 @@ export default function CategoryList({navigation}: {navigation: any}) {
           let newArr = [];
 
           for (let i = 0; i < rows.length; i++) {
-            rows.item(i).value = getTranslatedCategory(
-              rows.item(i).title,
-              translations.DB_NAME,
-            );
             newArr.push({
               ...rows.item(i),
             });
@@ -63,7 +58,7 @@ export default function CategoryList({navigation}: {navigation: any}) {
           key={i}
           icon={true}
           secondaryText={item.counter}
-          text={item.value}
+          text={item.title}
           onPress={() =>
             navigation.navigate('Topics', {
               category: item,

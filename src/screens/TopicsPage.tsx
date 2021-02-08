@@ -7,7 +7,6 @@ import {getColor} from '../constants/Themes';
 import Dimensions from '../constants/Dimensions';
 import ListItem from '../components/list/ListItem';
 import SQLite from 'react-native-sqlite-storage';
-import {getTranslatedTopic} from '../context/topicTranslator';
 
 const db = SQLite.openDatabase(
   {
@@ -48,10 +47,6 @@ export default function TopicsPage({
           const rows = results.rows;
           let newArr = [];
           for (let i = 0; i < rows.length; i++) {
-            rows.item(i).value = getTranslatedTopic(
-              rows.item(i).title,
-              translations.DB_NAME,
-            );
             newArr.push({
               ...rows.item(i),
             });
@@ -77,7 +72,7 @@ export default function TopicsPage({
           key={i}
           secondaryText=""
           icon={true}
-          text={item.value}
+          text={item.title}
           onPress={() => {
             navigation.navigate('Questions', {
               screen: 'QuestionsScreen',

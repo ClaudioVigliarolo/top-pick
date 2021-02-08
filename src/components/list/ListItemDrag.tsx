@@ -60,9 +60,7 @@ const CustomListItem = (props: CustomListItemProps) => {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <Menu
-          ref={setMenuRef}
-          button={<Text onPress={showMenu}>Show menu</Text>}>
+        <Menu ref={setMenuRef}>
           <MenuItem
             onPress={() => {
               hideMenu();

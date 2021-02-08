@@ -61,7 +61,7 @@ const ButtonsSection = (props: ButtonsSectionProps) => {
                 marginTop: 10,
               }}>
               <Text style={{color: getColor(theme, 'darkerOrange')}}>
-                {button.value}
+                {button.title}
               </Text>
             </Button>
           </React.Fragment>

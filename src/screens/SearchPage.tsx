@@ -5,12 +5,16 @@ import AsyncStorage from '@react-native-community/async-storage';
 import SearchBar from '../components/search/SearchBar';
 import {getColor} from '../constants/Themes';
 import {LocalizationContext} from '../context/LocalizationContext';
-import {Topic, Topics} from '../interfaces/Interfaces';
+import {Topic} from '../interfaces/Interfaces';
 import CardItem from '../components/list/CardItem';
 import ButtonsSection from '../components/buttons/ButtonsSearchSection';
 import data from '../../database/keys/keys';
 import SQLite from 'react-native-sqlite-storage';
-import {getTranslatedTopic, getCurrentTopics} from '../context/topicTranslator';
+
+interface Recent {
+  topic: string;
+  language: any;
+}
 
 const db = SQLite.openDatabase(
   {
@@ -35,8 +39,6 @@ const SearchPage = ({navigation}: {navigation: any}) => {
   const [popular, setPopular] = React.useState<Topic[]>([]);
   const [recents, setRecents] = React.useState<string[]>([]);
 
-  const currentTopics = getCurrentTopics(translations.DB_NAME);
-
   React.useEffect(() => {
     getRecents();
     getPopular();
@@ -60,10 +62,6 @@ const SearchPage = ({navigation}: {navigation: any}) => {
           const rows = results.rows;
           let newArr = [];
           for (let i = 0; i < rows.length; i++) {
-            rows.item(i).value = getTranslatedTopic(
-              rows.item(i).title,
-              translations.DB_NAME,
-            );
             newArr.push({
               ...rows.item(i),
             });
@@ -79,34 +77,40 @@ const SearchPage = ({navigation}: {navigation: any}) => {
 
   const onChangeRecents = async (newSearch: string) => {
     console.log('on cchhh recents', newSearch);
+    let newRecents: string[] = [];
     //check if contained, if so don't insert and put it to front
     if (recents.includes(newSearch)) {
-      let newArray: string[] = [];
-      newArray.push(newSearch);
+      recents.push(newSearch);
       recents.forEach((el) => {
         if (el != newSearch) {
-          newArray.push(el);
+          newRecents.push(el);
         }
-        setRecents(newArray);
+        newRecents = recents;
       });
     } else if (recents.length < MAX_RECENTS) {
       //push back
       recents.push(newSearch);
+      newRecents = [...recents];
     } else {
       let temp: string[] = [];
       temp.push(newSearch);
       let oldArray = recents.slice(0, 2);
-      const newArray = temp.concat(oldArray);
-      setRecents(newArray);
+      newRecents = temp.concat(oldArray);
     }
-    saveRecents();
+    setRecents(newRecents);
+    saveRecents(newRecents);
   };
 
-  const saveRecents = async () => {
+  const saveRecents = async (newRecents: string[]) => {
+    //create recents array
+    const newRecentsArray: Recent[] = newRecents.map((topic: string) => {
+      const item: Recent = {topic, language: translations.DB_NAME};
+      return item;
+    });
     try {
       await AsyncStorage.setItem(
-        data.RECENT_SEARCH_KEY,
-        JSON.stringify(recents),
+        data.RECENT_SEARCH_KEY + translations.DB_NAME,
+        JSON.stringify(newRecentsArray),
       );
     } catch (error) {
       // Error saving data
@@ -115,14 +119,18 @@ const SearchPage = ({navigation}: {navigation: any}) => {
 
   const getRecents = async () => {
     try {
-      const myArray = await AsyncStorage.getItem(data.RECENT_SEARCH_KEY);
-      if (myArray !== null) {
+      const retrievedArray = await AsyncStorage.getItem(
+        data.RECENT_SEARCH_KEY + translations.DB_NAME,
+      );
+      if (retrievedArray !== null) {
         // We have data!!
-        const retrievedTopics = JSON.parse(myArray);
-        retrievedTopics.filter((topic: string) =>
-          getTranslatedTopic(topic, translations.DB_NAME),
+        const recentsArray: string[] = JSON.parse(retrievedArray).map(
+          (el: Recent) => {
+            if (el.language == translations.DB_NAME) return el.topic;
+          },
         );
-        setRecents(JSON.parse(myArray));
+        const recents = recentsArray.filter((el) => el);
+        setRecents(recents);
       }
     } catch (error) {
       // Error retrieving data
@@ -134,21 +142,25 @@ const SearchPage = ({navigation}: {navigation: any}) => {
       setItems([]);
       return;
     }
-    const titleList: string[] = Object.keys(currentTopics).filter(function (
-      e,
-      key,
-    ) {
-      return currentTopics[e].includes(param.toLowerCase());
-    });
 
-    const newTopics = titleList.slice(0, MAX_RECENTS).map((title) => {
-      const topic: Topic = {
-        title,
-        value: currentTopics[title],
-      };
-      return topic;
+    db.transaction((tx) => {
+      tx.executeSql(
+        `SELECT title from topics${translations.DB_NAME}
+        WHERE title LIKE "%${param}%"
+        LIMIT 3;`,
+        [],
+        (tx, results) => {
+          const rows = results.rows;
+          let newArr = [];
+          for (let i = 0; i < rows.length; i++) {
+            newArr.push({
+              ...rows.item(i),
+            });
+          }
+          setItems(newArr);
+        },
+      );
     });
-    setItems(newTopics);
   };
 
   const styles = StyleSheet.create({
@@ -163,6 +175,7 @@ const SearchPage = ({navigation}: {navigation: any}) => {
       marginTop: '10%',
     },
   });
+
   return (
     <React.Fragment>
       <SearchBar
@@ -179,15 +192,13 @@ const SearchPage = ({navigation}: {navigation: any}) => {
           recents.map((title: string, i) => (
             <CardItem
               key={i}
-              text={getTranslatedTopic(title, translations.DB_NAME)}
+              text={title}
               color={getColor(theme, 'primaryOrange')}
               type="topic"
               onPress={() => {
                 const topic: Topic = {
                   title,
-                  value: getTranslatedTopic(title, translations.DB_NAME),
                 };
-                console.log('7777777', topic);
                 goQuestionsFromTopic(topic);
                 onChangeRecents(title);
                 setText('');
@@ -198,7 +209,7 @@ const SearchPage = ({navigation}: {navigation: any}) => {
           items.map((item: Topic, i) => (
             <CardItem
               key={i}
-              text={item.value}
+              text={item.title}
               color={getColor(theme, 'primaryOrange')}
               type="topic"
               onPress={() => {
