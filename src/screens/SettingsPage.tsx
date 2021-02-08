@@ -95,7 +95,7 @@ export default function CategoryList({navigation}: {navigation: any}) {
           showProgress={false}
           title="Reset App"
           message="All Your data and questions will get deleted. You cannot undo this operation "
-          closeOnTouchOutside={true}
+          closeOnTouchOutside={false}
           closeOnHardwareBackPress={false}
           messageStyle={{textAlign: 'center'}}
           showCancelButton={true}

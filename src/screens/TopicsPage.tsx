@@ -77,7 +77,7 @@ export default function TopicsPage({
           key={i}
           secondaryText=""
           icon={true}
-          text={item.title}
+          text={item.value}
           onPress={() => {
             navigation.navigate('Questions', {
               screen: 'QuestionsScreen',

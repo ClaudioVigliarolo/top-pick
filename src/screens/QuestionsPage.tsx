@@ -5,6 +5,7 @@ import {
   Alert,
   ScrollView,
   LayoutAnimation,
+  Text,
 } from 'react-native';
 import ThemeContext from '../context/ThemeContext';
 import {Question} from '../interfaces/Interfaces';
@@ -16,6 +17,7 @@ import SearchBar from '../components/search/SearchBar';
 import SQLite from 'react-native-sqlite-storage';
 import Clipboard from '@react-native-community/clipboard';
 import CopyAlert from '../components/custom/CopyAlert';
+import Dimensions from '../constants/Dimensions';
 const db = SQLite.openDatabase(
   {
     name: 'db.db',
@@ -127,12 +129,6 @@ export default function QuestionsPage({
     setItems(itemsCopy.slice());
   };
 
-  const removeHighliteWithDelay = () => {
-    setTimeout(function () {
-      setIsFlatListBeingTouched(false);
-    }, 100);
-  };
-
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -169,6 +165,18 @@ export default function QuestionsPage({
             setIsFlatListBeingTouched(false);
           }, 400);
         }}>
+        <View style={{backgroundColor: getColor(theme, 'primaryBackground')}}>
+          <Text
+            style={{
+              color: getColor(theme, 'lightGray'),
+              textAlign: 'left',
+              paddingLeft: '5%',
+              textTransform: 'uppercase',
+            }}>
+            {translations.SOURCE_TOPICS} ESL, Top Pick
+          </Text>
+        </View>
+
         {items.map((item: Question, i) => {
           if (item.title.toLowerCase().includes(filter.toLowerCase())) {
             return (
@@ -189,7 +197,9 @@ export default function QuestionsPage({
           }
         })}
       </ScrollView>
-      <View>
+
+      <View
+        style={{maxHeight: counter > 0 ? Dimensions.bottomButtonsHeight : 0}}>
         <BottomButton
           onPress={onSubmit}
           text={translations.NEXT}
@@ -199,7 +209,6 @@ export default function QuestionsPage({
           visible={counter > 0}
         />
       </View>
-      <CopyAlert isShown={isCopyShown} />
     </React.Fragment>
   );
 }

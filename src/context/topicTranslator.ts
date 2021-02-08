@@ -1,5 +1,9 @@
 
-import {Topics, Lang} from '../interfaces/Interfaces';
+import { Lang} from '../interfaces/Interfaces';
+
+interface Topics {
+    [name: string]: string
+}
 
     const italianTopics:Topics={
         computers : "computer",
@@ -119,7 +123,7 @@ import {Topics, Lang} from '../interfaces/Interfaces';
     aging:"aging",
 } 
 
-  export const getTranslatedTopic=<Topic extends keyof Topics>(topic:Topic, language: string): string=>
+  export const getTranslatedTopic=<Topic extends keyof Topics>(topic:Topic, language: string): any=>
   {
      switch (language) {
          case Lang.italian:
@@ -131,10 +135,10 @@ import {Topics, Lang} from '../interfaces/Interfaces';
          default:
              return  englishTopics[topic]?englishTopics[topic]: topic;
      }
-   };
+   }; 
    
-
-   export const getCurrentTopics=(language:string): Topics=>
+ 
+   export const getCurrentTopics=(language:string): any=>
    {
       switch (language) {
           case Lang.italian:

@@ -5,17 +5,20 @@ import {
   ScrollView,
   StatusBar,
   Dimensions as Dim,
+  TouchableOpacity,
 } from 'react-native';
+import {LocalizationContext} from '../context/LocalizationContext';
 import {getColor} from '../constants/Themes';
 import ThemeContext from '../context/ThemeContext';
 import {Text, View, StyleSheet, Image} from 'react-native';
 import Dimensions from '../constants/Dimensions';
-import AntDesign from 'react-native-vector-icons/AntDesign';
+import Icon from 'react-native-vector-icons/Ionicons';
 import Button from '../components/buttons/CustomButton';
 
 const StartSlides = ({onDone}: {onDone(): void}) => {
   const {theme} = React.useContext(ThemeContext);
   const [sliderState, setSliderState] = React.useState({currentPage: 0});
+  const {translations} = React.useContext(LocalizationContext);
   const {width, height} = Dim.get('window');
 
   const setSliderPage = (event: any) => {
@@ -54,7 +57,6 @@ const StartSlides = ({onDone}: {onDone(): void}) => {
     lastSlideHeader: {
       fontSize: 30,
       fontWeight: 'bold',
-      marginTop: '50%',
       marginBottom: 20,
       textAlign: 'center',
       color: '#fff',
@@ -84,6 +86,7 @@ const StartSlides = ({onDone}: {onDone(): void}) => {
       flex: 1,
       width: '80%',
       alignSelf: 'center',
+      justifyContent: 'center',
       flexDirection: 'column',
       alignItems: 'center',
     },
@@ -92,7 +95,33 @@ const StartSlides = ({onDone}: {onDone(): void}) => {
   return (
     <>
       <StatusBar barStyle="dark-content" />
+
       <SafeAreaView style={{flex: 1}}>
+        <TouchableOpacity
+          style={{position: 'absolute', right: '3%', top: '3%', zIndex: 1000}}
+          onPress={onDone}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                color: 'white',
+                fontStyle: 'italic',
+                fontSize: Dimensions.fontMed,
+              }}>
+              Skip
+            </Text>
+            <Icon
+              style={{marginLeft: 5}}
+              name="play-skip-forward-outline"
+              size={20}
+              color="#fff"
+            />
+          </View>
+        </TouchableOpacity>
         <ScrollView
           style={{
             flex: 1,
@@ -126,9 +155,9 @@ const StartSlides = ({onDone}: {onDone(): void}) => {
               resizeMode="center"
             />
             <View style={styles.wrapper}>
-              <Text style={styles.header}>Step 1: Choose</Text>
+              <Text style={styles.header}>{translations.STEP_1_TITLE}</Text>
               <Text style={styles.paragraph}>
-                Simply press on the card to select the topic
+                {translations.STEP_1_DESCRIPTION}
               </Text>
             </View>
           </View>
@@ -139,10 +168,9 @@ const StartSlides = ({onDone}: {onDone(): void}) => {
               resizeMode="center"
             />
             <View style={styles.wrapper}>
-              <Text style={styles.header}>STEP 2: Select </Text>
+              <Text style={styles.header}>{translations.STEP_2_TITLE}</Text>
               <Text style={styles.paragraph}>
-                You can Select the questions you like by pressing the little
-                square on the right
+                {translations.STEP_2_DESCRIPTION}
               </Text>
             </View>
           </View>
@@ -153,27 +181,26 @@ const StartSlides = ({onDone}: {onDone(): void}) => {
               resizeMode="center"
             />
             <View style={styles.wrapper}>
-              <Text style={styles.header}>STEP 3: Arrange</Text>
+              <Text style={styles.header}>{translations.STEP_3_TITLE}</Text>
               <Text style={styles.paragraph}>
-                You can put the questions in the order you prefer by dragging
-                the icon on the right
+                {translations.STEP_3_DESCRIPTION}
               </Text>
             </View>
           </View>
 
-          <View style={{width, height}}>
+          <View style={{width, height, alignItems: 'center'}}>
             <View style={styles.lastSlide}>
-              <Text style={styles.lastSlideHeader}>We are all ready</Text>
-              <Text style={styles.paragraph}>
-                TIP: You can rewatch this tutorial in the settings folder
+              <Text style={styles.lastSlideHeader}>
+                {translations.READY_TO_START}
               </Text>
-              <View style={{alignSelf: 'center', width: 200, marginTop: '30%'}}>
+              <Text style={styles.paragraph}>
+                {translations.READY_TO_START_TIP}
+              </Text>
+              <View style={{alignSelf: 'center', width: 200, marginTop: '10%'}}>
                 <Button
                   color={getColor(theme, 'lighterOrange')}
-                  title="Start!"
-                  onPress={() => {
-                    onDone();
-                  }}
+                  title={translations.START}
+                  onPress={onDone}
                 />
               </View>
             </View>

@@ -35,6 +35,8 @@ const SearchPage = ({navigation}: {navigation: any}) => {
   const [popular, setPopular] = React.useState<Topic[]>([]);
   const [recents, setRecents] = React.useState<string[]>([]);
 
+  const currentTopics = getCurrentTopics(translations.DB_NAME);
+
   React.useEffect(() => {
     getRecents();
     getPopular();
@@ -76,6 +78,7 @@ const SearchPage = ({navigation}: {navigation: any}) => {
   };
 
   const onChangeRecents = async (newSearch: string) => {
+    console.log('on cchhh recents', newSearch);
     //check if contained, if so don't insert and put it to front
     if (recents.includes(newSearch)) {
       let newArray: string[] = [];
@@ -115,6 +118,10 @@ const SearchPage = ({navigation}: {navigation: any}) => {
       const myArray = await AsyncStorage.getItem(data.RECENT_SEARCH_KEY);
       if (myArray !== null) {
         // We have data!!
+        const retrievedTopics = JSON.parse(myArray);
+        retrievedTopics.filter((topic: string) =>
+          getTranslatedTopic(topic, translations.DB_NAME),
+        );
         setRecents(JSON.parse(myArray));
       }
     } catch (error) {
@@ -123,43 +130,25 @@ const SearchPage = ({navigation}: {navigation: any}) => {
   };
 
   const executeSearch = (param: string): void => {
-    console.log('paramm', param);
     if (param == '') {
       setItems([]);
       return;
     }
-    const topics: Topics = getCurrentTopics(translations.DB_NAME);
-    console.log('resss', topics);
-    console.log(typeof topics);
-    // const result = topics.filter((topic) => {});
-    // setItems(result.slice(0, MAX_RECENTS));
+    const titleList: string[] = Object.keys(currentTopics).filter(function (
+      e,
+      key,
+    ) {
+      return currentTopics[e].includes(param.toLowerCase());
+    });
 
-    /*db.transaction((tx) => {
-     tx.executeSql( 
-        `SELECT title from topics${translations.DB_NAME}
-         WHERE title LIKE "%${param}%"
-         LIMIT 3;`,
-        [],
-        (tx, results) => {
-          const rows = results.rows;
-          let newArr = [];
-          console.log('!!!!!!');
-          for (let i = 0; i < rows.length; i++) {
-            rows.item(i).value = getTranslatedTopic(
-              rows.item(i).title,
-              translations.DB_NAME,
-            );
-            newArr.push({
-              ...rows.item(i),
-            });
-          }
-          setItems(newArr);
-        },
-        (err) => {
-          console.log('myerr', err);
-        },
-      );
-    });*/
+    const newTopics = titleList.slice(0, MAX_RECENTS).map((title) => {
+      const topic: Topic = {
+        title,
+        value: currentTopics[title],
+      };
+      return topic;
+    });
+    setItems(newTopics);
   };
 
   const styles = StyleSheet.create({
@@ -190,7 +179,7 @@ const SearchPage = ({navigation}: {navigation: any}) => {
           recents.map((title: string, i) => (
             <CardItem
               key={i}
-              text={title}
+              text={getTranslatedTopic(title, translations.DB_NAME)}
               color={getColor(theme, 'primaryOrange')}
               type="topic"
               onPress={() => {
@@ -198,6 +187,7 @@ const SearchPage = ({navigation}: {navigation: any}) => {
                   title,
                   value: getTranslatedTopic(title, translations.DB_NAME),
                 };
+                console.log('7777777', topic);
                 goQuestionsFromTopic(topic);
                 onChangeRecents(title);
                 setText('');
@@ -213,7 +203,7 @@ const SearchPage = ({navigation}: {navigation: any}) => {
               type="topic"
               onPress={() => {
                 goQuestionsFromTopic(item);
-                onChangeRecents(item.value);
+                onChangeRecents(item.title);
                 setText('');
               }}
             />
@@ -226,7 +216,7 @@ const SearchPage = ({navigation}: {navigation: any}) => {
             header={translations.POPULAR_SEARCHES}
             onSearch={(topic: Topic) => {
               goQuestionsFromTopic(topic);
-              onChangeRecents(topic.value);
+              onChangeRecents(topic.title);
               setText('');
             }}
           />

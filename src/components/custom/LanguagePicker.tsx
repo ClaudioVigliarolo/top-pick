@@ -5,7 +5,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import ThemeContext from '../../context/ThemeContext';
 import Dimensions from '../../constants/Dimensions';
 
-const DEFAULT_TEXT = 'App language: ';
+const DEFAULT_TEXT = '';
 interface CategoryListProps {
   title: string;
   onLanguageChange(newLang: string): void;
@@ -43,10 +43,9 @@ export default function CategoryList(props: CategoryListProps) {
         }}
         placeholder={text + props.title}
         //selectedLabelStyle={{color: getColor(theme, 'primaryOrange')}}
-        placeholderStyle={{color: '#fff'}}
         containerStyle={{height: 40}}
         labelStyle={{
-          color: '#fff',
+          color: getColor(theme, 'primaryText'),
           fontSize: Dimensions.fontList,
         }}
         onOpen={() => setText(text.replace(DEFAULT_TEXT, ''))}
