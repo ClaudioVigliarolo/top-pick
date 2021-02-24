@@ -20,6 +20,7 @@ italianTopics = {
     "business": "business",
     "body_language": "linguaggio del corpo",
     "adoption": "adozioni",
+    "pets": "animali domestici",
     "birthdays": "compleanni",
     "advice": "consigli",
     "conflict": "conflitti",
@@ -51,6 +52,7 @@ italianTopics = {
     "children": "bambini",
     "charity": "beneficienza",
     "earthquakes": "terremoti",
+    "university": "università",
     "culture": "culture",
     "dangers": "pericoli",
     "conversation": "conversazioni",
@@ -67,6 +69,7 @@ englishTopics = {
     "change": "change",
     "chores": "chores",
     "airplanes": "airplanes",
+    "university": "university",
     "cheating": "cheating",
     "clothes": "clothes",
     "creativity": "creativity",
@@ -105,6 +108,7 @@ englishTopics = {
     "behaviour": "behaviour",
     "countries": "countries",
     "crime": "crime",
+    "pets": "pets",
     "bags": "bags",
     "dating": "dating",
     "community": "community",
@@ -153,4 +157,4 @@ def get_category(word, lang):
     if lang == "IT":
         return italianCategories[word] if word in italianCategories else False
     else:
-        return englishCategories[word] if word in englishTopics else False
+        return englishCategories[word] if word in englishCategories else False

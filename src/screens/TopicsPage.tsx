@@ -35,7 +35,7 @@ export default function TopicsPage({
   React.useEffect(() => {
     db.transaction((tx) => {
       tx.executeSql(
-        `SELECT t.title
+        `SELECT *
         FROM topics${translations.DB_NAME} t
         WHERE t.title IN(
             SELECT c.topic 

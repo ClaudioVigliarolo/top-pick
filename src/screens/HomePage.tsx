@@ -40,7 +40,7 @@ const HomePage = ({navigation}: {navigation: any}) => {
   const loadTopics = async (n: number): Promise<void> => {
     db.transaction((tx) => {
       tx.executeSql(
-        `SELECT title from topics${translations.DB_NAME}
+        `SELECT * from topics${translations.DB_NAME}
         ORDER BY RANDOM()
         LIMIT ${n};`,
         [],

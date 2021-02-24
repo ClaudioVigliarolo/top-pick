@@ -1,17 +1,32 @@
 export interface Topic {
     title: string;
+    source: string;
   }
 
-export  interface Category {
+export interface Category {
     title: string;
-    counter: number;
+    counter:number;
+  }
+  
+  //counter: number;
+  export interface CategoryTopic {
+    category: string;
+    topic: number;
+  }
+
+  export interface Related {
+    title: string;
+    related: string;
   }
 
  export interface Question {
-    id: number;
+    id:number,  
     title: string;
-    selected: boolean;
-    liked: boolean;
+    related?: string;
+    topic?:string,
+    isLiked?:boolean;
+    isUserModified?:boolean;
+    selected?:boolean
   }
 
   
@@ -20,3 +35,12 @@ export  interface Category {
     english = 'EN',
   }
 
+  export interface JSONresponse{
+    categories: Category[],
+    topics:Topic[],
+    category_topics:CategoryTopic[],
+    related:[],
+    questions:Question[],
+    isUpdated:boolean
+  
+  };

@@ -22,7 +22,7 @@ interface CustomListItemProps {
   text: string;
   backgroundColor: string;
   isActive: boolean;
-  liked: boolean;
+  isLiked: boolean | undefined;
   opacity: number;
   onDrag(): void;
   onLike(id: number): void;
@@ -116,7 +116,7 @@ const CustomListItem = (props: CustomListItemProps) => {
 
         <View style={styles.iconContainer}>
           <LikeIcon
-            name={props.liked ? 'heart' : 'hearto'}
+            name={props.isLiked ? 'heart' : 'hearto'}
             color={getColor(theme, 'primaryOrange')}
             size={Dimensions.iconMedSmall}
             onPress={() => props.onLike(props.id)}

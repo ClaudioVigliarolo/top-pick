@@ -61,7 +61,7 @@ export default function CategoryList({navigation}: {navigation: any}) {
 
   const onDislike = (id: number) => {
     const index = items.findIndex((item) => item.id == id);
-    const newVal = !items[index].liked;
+    const newVal = !items[index].isLiked;
     db.transaction((tx) => {
       tx.executeSql(
         `UPDATE "questions${translations.DB_NAME}"
@@ -89,10 +89,13 @@ export default function CategoryList({navigation}: {navigation: any}) {
     return (
       <ListItemDrag
         onRemove={onRemove}
-        onLongPress={drag}
+        // onLongPress={drag}
+        onEdit={() => {}}
+        onDrag={() => {}}
         text={item.title}
+        number={index + 1}
         isActive={isActive}
-        liked={item.liked}
+        isLiked={item.isLiked}
         id={item.id}
         onLike={onDislike}
         backgroundColor={getColor(theme, 'primaryBackground')}

@@ -191,7 +191,7 @@ export default function QuestionsPage({
                 }}
                 text={item.title}
                 onValChange={(newVal: any) => onValChange(newVal, i)}
-                value={item.selected}
+                value={item.selected ? true : false}
               />
             );
           }

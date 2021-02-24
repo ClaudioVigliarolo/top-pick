@@ -1,5 +1,5 @@
 # usage: python CreateDB.py
-# example usage: python CreateDB.py --prefix EN
+# example usage: python CreateDBInserted.py --prefix EN
 # We insert the data from /data/PREFIX/ to the db
 import time
 import sys
@@ -35,7 +35,7 @@ categories = "../../data/" + LANG_PREFIX + "/categories/categories"
 related = "../../data/" + LANG_PREFIX + "/related/related"
 
 
-conn = connect('../../db/current.db')
+conn = connect('../../db/inserted.db')
 curs = conn.cursor()
 
 
@@ -52,27 +52,9 @@ curs.execute('CREATE TABLE categories'+LANG_PREFIX +
              ' ( "title" TEXT,  PRIMARY KEY("title"))')
 
 
-# populate categories table
-with open(categories) as file_in:
-    for line in file_in:
-        categ = line.split()[0]
-        if get_category(categ, LANG_PREFIX):
-            curs.execute("INSERT INTO categories"+LANG_PREFIX +
-                         "(title) VALUES (?)", (get_category(categ, LANG_PREFIX),))
-
 # create topics table
 curs.execute('CREATE TABLE topics'+LANG_PREFIX +
              '( "title" TEXT, "source" TEXT,  PRIMARY KEY("title"))')
-
-
-# populate topics table
-for topic_item_path in os.listdir(topics_path):
-    topic = os.path.basename(topic_item_path)
-    # discard pesky hidden files
-    if get_topic(topic, LANG_PREFIX):
-        curs.execute('''INSERT INTO topics'''+LANG_PREFIX+''' (title,source)
-                    values (?,?)''',
-                     (get_topic(topic, LANG_PREFIX), DEF_SOURCE))
 
 
 # create questions table
@@ -85,6 +67,26 @@ curs.execute('''CREATE TABLE questions'''+LANG_PREFIX + ''' (
 	FOREIGN KEY("topic") REFERENCES "topics"("title"),
 	PRIMARY KEY("id", "topic")
 )''')
+
+
+# populate categories table
+with open(categories) as file_in:
+    for line in file_in:
+        categ = line.split()[0]
+        if get_category(categ, LANG_PREFIX):
+            curs.execute("INSERT INTO categories"+LANG_PREFIX +
+                         "(title) VALUES (?)", (get_category(categ, LANG_PREFIX),))
+
+
+# populate topics table
+for topic_item_path in os.listdir(topics_path):
+    topic = os.path.basename(topic_item_path)
+    # discard pesky hidden files
+    if get_topic(topic, LANG_PREFIX):
+        curs.execute('''INSERT INTO topics'''+LANG_PREFIX+''' (title,source)
+                    values (?,?)''',
+                     (get_topic(topic, LANG_PREFIX), DEF_SOURCE))
+
 
 # populate questions table
 for topic_item_path in os.listdir(topics_path):

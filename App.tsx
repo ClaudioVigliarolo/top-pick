@@ -6,16 +6,31 @@ import ThemeContext from './src/context/ThemeContext';
 import AsyncStorage from '@react-native-community/async-storage';
 import Navigation from './src/navigation';
 import RNBootSplash from 'react-native-bootsplash';
-import data from './database/keys/keys';
+import keys from './database/keys/keys';
 import {LocalizationContext} from './src/context/LocalizationContext';
 import StartSlides from './src/startSlides/StartSlider';
 import {LocalizationProvider} from './src/context/LocalizationContext';
+import {updateTopics} from './src/utils/api';
+import UpdateContext from './src/context/UpdateContext';
+import {
+  getLastUpdate,
+  getStoredLanguage,
+  isConnected,
+  readTheme,
+} from './src/utils/utils';
+import Loader from './src/components/custom/Loader';
 
 // 0: loading, 1: already launched, 2: firstLaunch
 
 const App = () => {
-  const [loading, setLoading] = React.useState(true);
-  const [theme, setStateTheme] = React.useState('light');
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [theme, setStateTheme] = React.useState<string>('light');
+  const [isLoadingContent, setStateLoadingContent] = React.useState<boolean>(
+    false,
+  );
+  const [isUpdatedContent, setStateUpdatedContent] = React.useState<boolean>(
+    false,
+  );
   const {
     translations,
     appLanguage,
@@ -25,29 +40,28 @@ const App = () => {
 
   const [language, setLanguage] = React.useState('');
   const [isFirstLaunch, setFirstLaunch] = React.useState(false);
-  const readTheme = async () => {
-    try {
-      const theme = await AsyncStorage.getItem(data.THEME_KEY);
-      if (theme === null || theme == 'light') {
-        setStateTheme('light');
-      } else {
-        setStateTheme('dark');
-      }
-    } catch (e) {
-      console.log('Failed to fetch the data from storage');
-    }
-  };
 
   React.useEffect(() => {
-    (async () => {
-      readTheme();
-    })();
+    async () => {
+      setStateTheme(await readTheme());
+    };
+
     (async () => {
       configureLanguage();
     })();
 
     (async () => {
       checkIfFirstLaunch();
+    })();
+
+    (async () => {
+      /* (await isConnected()) &&
+        (await updateTopics(
+          await getLastUpdate(),
+          await getStoredLanguage(),
+          setUpdatedContent,
+          setLoadingContent,
+        ));*/
     })();
 
     (async () => {
@@ -59,9 +73,9 @@ const App = () => {
 
   const checkIfFirstLaunch = async () => {
     try {
-      const hasLaunched = await AsyncStorage.getItem(data.HAS_LAUNCHED);
+      const hasLaunched = await AsyncStorage.getItem(keys.HAS_LAUNCHED);
       if (hasLaunched === null) {
-        AsyncStorage.setItem(data.HAS_LAUNCHED, 'true');
+        AsyncStorage.setItem(keys.HAS_LAUNCHED, 'true');
         setFirstLaunch(true);
       } else {
         setFirstLaunch(false);
@@ -74,27 +88,40 @@ const App = () => {
   const setTheme = async (newTheme: string) => {
     try {
       setStateTheme(newTheme);
-      await AsyncStorage.setItem(data.THEME_KEY, newTheme);
+      await AsyncStorage.setItem(keys.THEME_KEY, newTheme);
     } catch (e) {}
   };
 
+  const setLoadingContent = async (val: boolean) => {
+    setStateLoadingContent(val);
+  };
+
+  const setUpdatedContent = async (val: boolean) => {
+    setStateUpdatedContent(val);
+  };
+
   const themeVal = {theme, setTheme};
+  const loadingVal = {
+    isLoadingContent,
+    setLoadingContent,
+    setUpdatedContent,
+    isUpdatedContent,
+  };
+
   if (loading) return null;
 
   return (
     <ThemeContext.Provider value={themeVal}>
-      <StatusBar barStyle="light-content" backgroundColor="black" />
-      <MenuProvider>
-        <LocalizationProvider>
-          <SafeAreaProvider>
-            {isFirstLaunch ? (
-              <StartSlides onDone={() => setFirstLaunch(false)} />
-            ) : (
+      <UpdateContext.Provider value={loadingVal}>
+        <StatusBar barStyle="light-content" backgroundColor="black" />
+        <MenuProvider>
+          <LocalizationProvider>
+            <SafeAreaProvider>
               <Navigation />
-            )}
-          </SafeAreaProvider>
-        </LocalizationProvider>
-      </MenuProvider>
+            </SafeAreaProvider>
+          </LocalizationProvider>
+        </MenuProvider>
+      </UpdateContext.Provider>
     </ThemeContext.Provider>
   );
 };

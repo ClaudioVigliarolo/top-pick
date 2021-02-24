@@ -33,14 +33,14 @@ const db = SQLite.openDatabase(
   () => {},
 );
 
-const getQuestionHtml = (items: Question[]) => {
+const getQuestionHtml = (items: Question[], title: string) => {
   const htmlContent = `
   <!DOCTYPE html>
   <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Pdf Content</title>
+        <title>Pdf Topic</title>
         <style>
             body {
                 font-size: 16px;
@@ -56,7 +56,7 @@ const getQuestionHtml = (items: Question[]) => {
         </style>
     </head>
     <body>
-        <h3>Topic Title</h3>
+        <h3 style="text-transform: uppercase" >${title}</h3>
         <div style="margin-top:50px">
           <ol>
             ${items
@@ -106,10 +106,6 @@ export default function OrderPage({
     setEditing(true);
     setQuestionText(newText);
     setQuestionId(id);
-    /* const newItems = [...items];
-    const index = newItems.findIndex((item) => item.id == id);
-    newItems[index].title = newText;
-    setItems(newItems.slice()); */
   };
 
   const renderItem = ({
@@ -131,7 +127,7 @@ export default function OrderPage({
         number={index + 1}
         text={item.title}
         isActive={isActive}
-        liked={item.liked}
+        isLiked={item.isLiked}
         onLike={onLike}
         id={item.id}
         backgroundColor={getColor(theme, 'primaryBackground')}
@@ -173,7 +169,7 @@ export default function OrderPage({
           const question_id = results.insertId;
           const newQuestionItem: Question = {
             id: question_id,
-            liked: false,
+            isLiked: false,
             selected: false,
             title: questionText,
           };
@@ -226,7 +222,7 @@ export default function OrderPage({
   const onLike = (id: number) => {
     let itemsCopy = [...items];
     const index = items.findIndex((item) => item.id == id);
-    const newVal = !items[index].liked;
+    const newVal = !items[index].isLiked;
     db.transaction((tx) => {
       tx.executeSql(
         `UPDATE "questions${translations.DB_NAME}"
@@ -234,7 +230,7 @@ export default function OrderPage({
         WHERE "id" = ${id}`,
         [],
         (tx, results) => {
-          items[index].liked = newVal;
+          items[index].isLiked = newVal;
           setItems(itemsCopy.slice());
         },
         (err) => {
@@ -260,7 +256,7 @@ export default function OrderPage({
   const handleButtons = (functionName: string): void => {
     switch (functionName) {
       case translations.EXPORT_TO_PDF:
-        createPDF(getQuestionHtml(items));
+        createPDF(getQuestionHtml(items, topic.title));
         break;
 
       case translations.START_PRESENTATION:

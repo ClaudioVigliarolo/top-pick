@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {View, Image, TouchableOpacity, Button} from 'react-native';
+import {View, Image, TouchableOpacity, Button, Alert} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import HomePage from '../screens/HomePage';
 import CategoriesPage from '../screens/CategoriesPage';
@@ -10,14 +10,22 @@ import OrderPage from '../screens/OrderPage';
 import {LocalizationContext} from '../context/LocalizationContext';
 import IconBack from 'react-native-vector-icons/MaterialIcons';
 import MenuIcon from 'react-native-vector-icons/MaterialIcons';
+import IconUpdate from 'react-native-vector-icons/Ionicons';
+import IconChecked from 'react-native-vector-icons/Ionicons';
 
+import {Container, Header, Content, Spinner, Text} from 'native-base';
 import FavouritesPage from '../screens/FavouritesPage';
 import SearchPage from '../screens/SearchPage';
 import PresentationPage from '../screens/PresentationPage';
-
+import AwesomeAlert from 'react-native-awesome-alerts';
 import {getColor} from '../constants/Themes';
 import Dimensions from '../constants/Dimensions';
 import SettingsPage from '../screens/SettingsPage';
+import UpdateContext from '../context/UpdateContext';
+import {updateTopics} from '../utils/api';
+import {getLastUpdate, getStoredLanguage, isConnected} from '../utils/utils';
+import SelectLanguagePage from '../screens/SelectLanguagePage';
+import ThemePage from '../screens/ThemePage';
 
 const Stack = createStackNavigator();
 
@@ -202,14 +210,131 @@ const SettingsStack = ({navigation}: {navigation: any}) => {
           },
         }}
       />
+
+      <Stack.Screen
+        name="Language"
+        component={SelectLanguagePage}
+        options={{
+          title: translations.SELECT_LANGUAGE,
+          headerTintColor: getColor(theme, 'headerPrimary'),
+
+          headerStyle: {
+            backgroundColor: getColor(theme, 'primaryHeaderBackground'),
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerLeft: () => (
+            <BackStructure destination="Settings" navigation={navigation} />
+          ),
+          headerRight: () => (
+            <IconChecked
+              name="checkmark-done"
+              color="#fff"
+              onPress={() => {}}
+              size={Dimensions.iconMed}
+              style={{
+                marginRight: 20,
+              }}
+            />
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="Theme"
+        component={ThemePage}
+        options={{
+          title: translations.CHANGE_THEME,
+          headerTintColor: getColor(theme, 'headerPrimary'),
+
+          headerStyle: {
+            backgroundColor: getColor(theme, 'primaryHeaderBackground'),
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerLeft: () => (
+            <BackStructure destination="Settings" navigation={navigation} />
+          ),
+          headerRight: () => (
+            <IconChecked
+              name="checkmark-done"
+              color="#fff"
+              onPress={() => {}}
+              size={Dimensions.iconMed}
+              style={{
+                marginRight: 20,
+              }}
+            />
+          ),
+        }}
+      />
     </Stack.Navigator>
   );
 };
 
+const renderConnectivityIcon = (
+  isLoadingContent: boolean,
+  isUpdated: boolean,
+  setLoadingContent: (val: boolean) => void,
+  setUpdatedContent: (val: boolean) => void,
+  setUpdatedAlert: (val: boolean) => void,
+): any => {
+  console.log('laoding', isLoadingContent);
+
+  if (isLoadingContent) {
+    return <Spinner color="white" size="small" style={{marginRight: 20}} />;
+  }
+
+  if (isUpdated) {
+    return (
+      <IconChecked
+        name="checkmark-done"
+        color="#fff"
+        onPress={() => {
+          setUpdatedAlert(true);
+        }}
+        size={Dimensions.iconMed}
+        style={{
+          marginRight: 20,
+        }}
+      />
+    );
+  } else {
+    return (
+      <IconUpdate
+        name="reload"
+        color="#fff"
+        onPress={async () =>
+          (await isConnected()) &&
+          updateTopics(
+            await getLastUpdate(),
+            await getStoredLanguage(),
+            setUpdatedContent,
+            setLoadingContent,
+          )
+        }
+        size={Dimensions.iconMedSmall}
+        style={{
+          marginRight: 20,
+        }}
+      />
+    );
+  }
+};
+
 const HomeStack = ({navigation}: {navigation: any}) => {
   const {theme} = React.useContext(ThemeContext);
-  const {translations} = React.useContext(LocalizationContext);
+  const {
+    isLoadingContent,
+    setLoadingContent,
+    isUpdatedContent,
+    setUpdatedContent,
+  } = React.useContext(UpdateContext);
 
+  const [isUpdatedAlert, setUpdatedAlert] = React.useState<boolean>(false);
+  const {translations} = React.useContext(LocalizationContext);
   return (
     <Stack.Navigator initialRouteName="HomeScreen">
       <Stack.Screen
@@ -217,8 +342,52 @@ const HomeStack = ({navigation}: {navigation: any}) => {
         component={HomePage}
         options={{
           headerTitleAlign: 'center',
-          title: 'TOP Pick',
+          title: isLoadingContent ? 'updating topics...' : 'TOP Picks',
           headerTintColor: getColor(theme, 'headerPrimary'),
+          headerRight: () => (
+            <View>
+              {isLoadingContent && (
+                <AwesomeAlert
+                  show={isLoadingContent}
+                  showProgress={isLoadingContent}
+                  progressColor={getColor(theme, 'primaryOrange')}
+                  title="updating topics..."
+                  titleStyle={{color: getColor(theme, 'primaryOrange')}}
+                  closeOnTouchOutside={false}
+                  progressSize={50}
+                  message="Wait until the topics are updating"
+                  closeOnHardwareBackPress={false}
+                  showCancelButton={false}
+                  messageStyle={{textAlign: 'center'}}
+                  cancelButtonColor={getColor(theme, 'primaryOrange')}
+                  onCancelPressed={() => {}}
+                  onConfirmPressed={() => {}}
+                />
+              )}
+              {isUpdatedAlert && (
+                <AwesomeAlert
+                  show={isUpdatedAlert}
+                  showProgress={false}
+                  titleStyle={{color: getColor(theme, 'primaryOrange')}}
+                  title="Top Picks"
+                  message="All The topics are syncronized!"
+                  closeOnTouchOutside={true}
+                  onDismiss={() => setUpdatedAlert(false)}
+                  closeOnHardwareBackPress={false}
+                  messageStyle={{textAlign: 'center'}}
+                  cancelText="No,Cancel"
+                  confirmText="Ok,Delete"
+                />
+              )}
+              {renderConnectivityIcon(
+                isLoadingContent,
+                isUpdatedContent,
+                setLoadingContent,
+                setUpdatedContent,
+                setUpdatedAlert,
+              )}
+            </View>
+          ),
           headerLeft: () => (
             <NavigationDrawerStructure navigationProps={navigation} />
           ),

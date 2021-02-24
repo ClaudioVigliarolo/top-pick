@@ -22,7 +22,6 @@ export const LocalizationProvider = ({children}: {children: any}) => {
   };
 
   const configureLanguage = async () => {
-    ('00 OKK');
     const currentLanguage = await AsyncStorage.getItem(keys.LANGUAGE_KEY);
     if (!currentLanguage) {
       let localeCode = DEFAULT_LANGUAGE;

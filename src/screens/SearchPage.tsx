@@ -8,7 +8,7 @@ import {LocalizationContext} from '../context/LocalizationContext';
 import {Topic} from '../interfaces/Interfaces';
 import CardItem from '../components/list/CardItem';
 import ButtonsSection from '../components/buttons/ButtonsSearchSection';
-import data from '../../database/keys/keys';
+import keys from '../../database/keys/keys';
 import SQLite from 'react-native-sqlite-storage';
 
 interface Recent {
@@ -54,7 +54,7 @@ const SearchPage = ({navigation}: {navigation: any}) => {
   const getPopular = (): void => {
     db.transaction((tx) => {
       tx.executeSql(
-        `SELECT title from topics${translations.DB_NAME}
+        `SELECT * from topics${translations.DB_NAME}
         ORDER BY RANDOM()
         LIMIT ${MAX_POPULAR};`,
         [],
@@ -109,7 +109,7 @@ const SearchPage = ({navigation}: {navigation: any}) => {
     });
     try {
       await AsyncStorage.setItem(
-        data.RECENT_SEARCH_KEY + translations.DB_NAME,
+        keys.RECENT_SEARCH_KEY + translations.DB_NAME,
         JSON.stringify(newRecentsArray),
       );
     } catch (error) {
@@ -120,7 +120,7 @@ const SearchPage = ({navigation}: {navigation: any}) => {
   const getRecents = async () => {
     try {
       const retrievedArray = await AsyncStorage.getItem(
-        data.RECENT_SEARCH_KEY + translations.DB_NAME,
+        keys.RECENT_SEARCH_KEY + translations.DB_NAME,
       );
       if (retrievedArray !== null) {
         // We have data!!
@@ -145,7 +145,7 @@ const SearchPage = ({navigation}: {navigation: any}) => {
 
     db.transaction((tx) => {
       tx.executeSql(
-        `SELECT title from topics${translations.DB_NAME}
+        `SELECT * from topics${translations.DB_NAME}
         WHERE title LIKE "%${param}%"
         LIMIT 3;`,
         [],
@@ -198,6 +198,7 @@ const SearchPage = ({navigation}: {navigation: any}) => {
               onPress={() => {
                 const topic: Topic = {
                   title,
+                  source: '',
                 };
                 goQuestionsFromTopic(topic);
                 onChangeRecents(title);

@@ -26,11 +26,12 @@ export default function CategoryList({navigation}: {navigation: any}) {
     db.transaction((tx) => {
       tx.executeSql(
         `SELECT category as title, count(*) as counter
-        from category_topics${translations.DB_NAME} 
+        from category_topicsEN
         GROUP BY category;`,
         [],
         (tx, results) => {
           const rows = results.rows;
+          console.log('MYRESS', rows);
           let newArr = [];
 
           for (let i = 0; i < rows.length; i++) {
@@ -38,11 +39,13 @@ export default function CategoryList({navigation}: {navigation: any}) {
               ...rows.item(i),
             });
           }
+          console.log('tuttttt', newArr);
+
           setItems([...newArr]);
         },
       );
     });
-  });
+  }, [translations.DB_NAME]);
 
   const styles = StyleSheet.create({
     container: {
