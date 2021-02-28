@@ -21,35 +21,29 @@ const db = SQLite.openDatabase(
     () => {},
   );
 
-  const getPrimaryDB=async ():Promise<SQLiteDatabase>=>{
-    let dbName = await AsyncStorage.getItem(keys.CURRENT_DB); 
-    if(!dbName) //roll back to first db if nothing is saved
-      dbName = FIRST_DB_NAME;
 
-      return SQLite.openDatabase(
+
+  export const getDB=():SQLiteDatabase=>{
+      const db = SQLite.openDatabase(
         {
-          name: FIRST_DB_NAME,
+          name: "db.db",
           location: 'default',
           createFromLocation: 1,
         },
         () => {},
         () => {},
       ); 
+      return db;
     }
     
-    const getSecondaryDB=async ():Promise<SQLiteDatabase>=>{
-      let primaryDbName = await AsyncStorage.getItem(keys.CURRENT_DB); 
-      const secondaryDbName = (!primaryDbName || primaryDbName == FIRST_DB_NAME)? SECOND_DB_NAME: FIRST_DB_NAME
-        return SQLite.openDatabase(
-          {
-            name: secondaryDbName,
-            location: 'default',
-            createFromLocation: 1,
-          },
-          () => {},
-          () => {},
-        ); 
-      }
+
+  export const getUpdateSettings = async (): Promise<boolean> => {
+    const isAutomaticUpdate = await AsyncStorage.getItem(keys.SETTINGS_UPDATE);
+    console.log('my new isAutomaticUpdate', isAutomaticUpdate);
+    return isAutomaticUpdate == 'true' ? true : false;
+  };
+
+
 
   const changeDB=async ():Promise<void>=>{
     let oldDbName = await AsyncStorage.getItem(keys.CURRENT_DB); 
@@ -60,6 +54,14 @@ const db = SQLite.openDatabase(
     const getDate=():string=>{
     const formatYmd = (date: { toISOString: () => string | any[]; }) => date.toISOString().slice(0, 10);
     return formatYmd.toString()
+}
+
+
+export function hashCode(str: string):number {
+  const id= str.split('').reduce((prevHash, currVal) =>
+    (((prevHash << 5) - prevHash) + currVal.charCodeAt(0))|0, 0);
+    console.log("my id"+ id)
+    return id
 }
 
 
@@ -110,67 +112,49 @@ export const getStoredLanguage = async ():Promise<string> => {
 };
 
 
-  export const generateDB=async (data:JSONresponse,DB_PREFIX:string):Promise<boolean>=>{
-
-      //get secondary db
-      const db = await getSecondaryDB();
-      //clean secondary db
-      try{
-        await db.transaction((tx) => { 
-          tx.executeSql('delete from categories'+DB_PREFIX),
-          tx.executeSql('delete from topics'+DB_PREFIX)
-
-        });
-
-
-      }catch(e)
-      {
-        console.error("couldnt clean the secondary db")
-      }
-
-
-
-
-      console.log("qqqqq",data.questions)
-      //delete categories table
+  export const generateDB2= async (data:JSONresponse,DB_PREFIX:string):Promise<boolean>=>{
       console.log("start generate")
       try{
-
+        //delete all categories
         await db.transaction((tx) => { 
             tx.executeSql('delete from categories'+DB_PREFIX)
           });
 
           //insert new categories
-          data.categories.forEach(async (categ:Category) => {
+        await Promise.all([...data.categories.map(async (categ:Category) => {
             await db.transaction((tx) => { 
                 tx.executeSql(        
                   `INSERT INTO categories${DB_PREFIX} (title) VALUES (?)`,
                   [categ.title],
                   (tx, results) => {               
                     if (results.rowsAffected > 0 ) {
-                      console.log('Insert success');              
+                      console.log('Insert SUCCESS CATEG');              
                     } else {
-                      console.log('Insert failed');
+                      console.log('Insert FAILED');
                     }
-                  }
-                );
-               });
-            });
+                  })}) })])
+    
         //delete all topics
         await db.transaction((tx) => { 
           tx.executeSql('delete from topics'+DB_PREFIX)
         });
 
         //insert new topics
-        data.topics.forEach(async (topic:Topic) => {
-        console.log("ttt",topic.title)
+        await Promise.all([...data.topics.map(async (topic:Topic) => {
           await db.transaction((tx) => { 
             tx.executeSql(        
               `INSERT INTO topics${DB_PREFIX} (title,source) VALUES (?,?)`,
               [topic.title,topic.source],
-            );
-           });});
+              (tx, results) => {               
+                if (results.rowsAffected > 0 ) {
+                  console.log('Insert SUCCESS TOPP');              
+                } else {
+                  console.log('Insert FAILED');
+                }
+              })}) })])
 
+
+           console.log("finish 1")
 
         //delete category topics table
         await db.transaction((tx) => { 
@@ -178,94 +162,154 @@ export const getStoredLanguage = async ():Promise<string> => {
         });
 
         //insert new category topics table
-        data.category_topics.forEach(async(topic:CategoryTopic) => {
+        await Promise.all([...data.category_topics.map(async (topic:CategoryTopic) => {
           await db.transaction((tx) => { 
             tx.executeSql(        
               `INSERT INTO category_topics${DB_PREFIX} (category, topic) VALUES (?,?)`,
               [topic.category,topic.topic],
-            );
-           });
+              (tx, results) => {               
+                if (results.rowsAffected > 0 ) {
+                  console.log('Insert SUCCESS ENTR');              
+                } else {
+                  console.log('Insert FAILED');
+                }
+              })}) })])
+
+          console.log("finish 2")
+          console.log("updated category topics")
+          //delete questions NOT modified by user
+          db.transaction((tx) => { 
+            tx.executeSql(`delete from questions${DB_PREFIX} WHERE user_modified IN (0)`)
           });
-         console.log("updated category topics")
-        //delete questions NOT modified by user
-        db.transaction((tx) => { 
-          tx.executeSql(`delete from questions${DB_PREFIX} WHERE user_modified IN (0)`)
-        });
 
           //insert new questions
-          data.questions.forEach(async(question:Question) => {
-        console.log("aaa")
-
+         Promise.all([...data.questions.map(async (question:Question) => {
             await db.transaction((tx) => { 
               tx.executeSql(        
-                `INSERT INTO questions${DB_PREFIX} (id, topic,title) VALUES (?,?,?)`,
+                `INSERT OR IGNORE INTO questions${DB_PREFIX} (id, topic,title) VALUES (?,?,?)`,
                 [question.id,question.topic, question.title],
-              );
-             });
-        });
+                (tx, results) => {               
+                  if (results.rowsAffected > 0 ) {
+                    console.log('Insert SUCCESS QQQ');              
+                  } else {
+                    console.log('Insert FAILED');
+                  }
+                })}) })]).then(()=>console.log("finish 77"))
+        console.log("finish 3")
          return true;
       }catch(e)
       {
          return false;
       }
     }
-      /*
-      //delete all topics
-      db.transaction((tx) => { 
-        tx.executeSql('delete from topics'+DB_PREFIX)
-      });
+      
 
-      //insert new topics
-      data.topics.forEach((topic:Topic) => {
-        db.transaction((tx) => { 
-        tx.executeSql(`INSERT INTO topics"+DB_PREFIX +
-        "(title,source) VALUES (?,?), ${topic.title},${topic.source}`,)
-        .then(()=>{
-          console.log("updated topics")
-        })
-      });
-    });
 
-      //delete category topics table
-      db.transaction((tx) => { 
-        tx.executeSql('delete from category_topics'+DB_PREFIX)
-      });
 
-        //insert new topics
-        data.category_topics.forEach((topic:CategoryTopic) => {
-        db.transaction((tx) => { 
-        tx.executeSql(`INSERT INTO topics"+DB_PREFIX +
-        "(category, topic) VALUES (?,?), ${topic.category},${topic.topic}`,)
-        .then(()=>{
-          console.log("updated category topics")
-        })
-      });
-    });
-    
-    */
-
-      /*
-          //delete questions NOT modified by user
-          db.transaction((tx) => { 
-            tx.executeSql(`delete from questions${DB_PREFIX} WHERE user_modified IN (0)`)
+  export const generateDB= async (data:JSONresponse,DB_PREFIX:string):Promise<boolean>=>{
+    console.log("start generate")
+      try{
+        //delete all categories
+        await db.transaction((tx) => { 
+            tx.executeSql('delete from categories'+DB_PREFIX)
           });
 
-            //insert new questions
-            data.questions.forEach((topic:CategoryTopic) => {
-              db.transaction((tx) => { 
-              tx.executeSql(`INSERT INTO topics"+DB_PREFIX +
-              "(category, topic) VALUES (?,?), ${topic.category},${topic.topic}`,)
-              .then(()=>{
-                console.log("updated category topics")
-              })
-            });
-          });
-        */
-   
+          //insert new categories
+        await Promise.all([...data.categories.map(async (categ:Category) => {
+             await addCategory(categ, DB_PREFIX)
+            })])
 
+
+          //delete all topics
+          await db.transaction((tx) => { 
+            tx.executeSql('delete from topics'+DB_PREFIX)
+          });
+
+          //insert new topics
+          await Promise.all([...data.topics.map(async (topic:Topic) => {
+            await addTopic(topic, DB_PREFIX)
+          })])
+
+
+           //delete category topics table
+           await db.transaction((tx) => { 
+            tx.executeSql('delete from category_topics'+DB_PREFIX)
+          });
+  
+          //insert new category topics table
+          await Promise.all([...data.category_topics.map(async (categTopic:CategoryTopic) => {
+            await addCategTopic(categTopic, DB_PREFIX)
+          })])
+
+
+          //insert new questions
+        await Promise.all([...data.questions.map(async (question:Question) => {
+          await addQuestion(question, DB_PREFIX)
+            })])
+        console.log("finish 3")
+        return true;
+
+    }catch(e)
+    {
+       return false;
+    }
+  }
+
+  async function addQuestion (question:Question, DB_PREFIX: string)  {
+    return new Promise<void>((resolve, reject) => {
+       db.transaction((tx) => { 
+        tx.executeSql(        
+          `INSERT OR IGNORE INTO questions${DB_PREFIX} (id, topic,title) VALUES (?,?,?)`,
+          [question.id,question.topic, question.title],
+          (tx, results) => {               
+           console.log("inserted");
+           resolve();
+          })})
+  });
+}
+
+async function addCategory (categ:Category, DB_PREFIX: string)  {
+  return new Promise<void>((resolve, reject) => {
+     db.transaction((tx) => { 
+      tx.executeSql(        
+        `INSERT INTO categories${DB_PREFIX} (title) VALUES (?)`,
+        [categ.title],
+        (tx, results) => {               
+         console.log("inserted");
+         resolve();
+        })})
+});
+}
+
+async function addTopic (topic:Topic, DB_PREFIX: string)  {
+  return new Promise<void>((resolve, reject) => {
+     db.transaction((tx) => { 
+      tx.executeSql(        
+        `INSERT INTO topics${DB_PREFIX} (title,source) VALUES (?,?)`,
+        [topic.title,topic.source],
+        (tx, results) => {               
+         console.log("inserted");
+         resolve();
+        })})
+});
+}
+
+
+async function addCategTopic (categTopic:CategoryTopic, DB_PREFIX: string)  {
+  return new Promise<void>((resolve, reject) => {
+     db.transaction((tx) => { 
+        tx.executeSql(        
+          `INSERT INTO category_topics${DB_PREFIX} (category, topic) VALUES (?,?)`,
+          [categTopic.category,categTopic.topic],
+        (tx, results) => {               
+         console.log("inserted");
+         resolve();
+        })})
+});
+}
 
    export const isConnected=async ():Promise<boolean>=>{
         const state = await NetInfo.fetch();
         console.log("CONNN"+state.isConnected)
         return state.isConnected? true:false;
-      }
+     }

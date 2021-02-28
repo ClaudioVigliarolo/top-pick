@@ -24,7 +24,7 @@ export interface Category {
     title: string;
     related?: string;
     topic?:string,
-    isLiked?:boolean;
+    liked?:boolean;
     isUserModified?:boolean;
     selected?:boolean
   }

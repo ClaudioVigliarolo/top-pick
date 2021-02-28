@@ -1,22 +1,11 @@
 import * as React from 'react';
-import {StyleSheet, Alert, ScrollView} from 'react-native';
+import {StyleSheet, ScrollView} from 'react-native';
 import {Topic, Category} from '../interfaces/Interfaces';
 import {LocalizationContext} from '../context/LocalizationContext';
 import ThemeContext from '../context/ThemeContext';
 import {getColor} from '../constants/Themes';
-import Dimensions from '../constants/Dimensions';
 import ListItem from '../components/list/ListItem';
-import SQLite from 'react-native-sqlite-storage';
-
-const db = SQLite.openDatabase(
-  {
-    name: 'db.db',
-    location: 'default',
-    createFromLocation: 1,
-  },
-  () => {},
-  () => {},
-);
+import {getDB} from '../utils/utils';
 
 export default function TopicsPage({
   route,
@@ -33,9 +22,10 @@ export default function TopicsPage({
   const {category} = route.params;
 
   React.useEffect(() => {
-    db.transaction((tx) => {
+    console.log('yuppppi');
+    getDB().transaction((tx) => {
       tx.executeSql(
-        `SELECT *
+        `SELECT t.title
         FROM topics${translations.DB_NAME} t
         WHERE t.title IN(
             SELECT c.topic 
@@ -51,7 +41,11 @@ export default function TopicsPage({
               ...rows.item(i),
             });
           }
+          console.log('suuuu', newArr);
           setItems(newArr);
+        },
+        (err) => {
+          console.log(err);
         },
       );
     });

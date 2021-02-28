@@ -22,13 +22,13 @@ interface CustomListItemProps {
   text: string;
   backgroundColor: string;
   isActive: boolean;
-  isLiked: boolean | undefined;
+  liked: boolean | undefined;
   opacity: number;
-  onDrag(): void;
-  onLike(id: number): void;
+  onDrag?(): void;
+  onToggleLike(id: number): void;
   onRemove(id: number): void;
-  onEdit(id: number, text: string): void;
-  number: number;
+  onEdit?(id: number, text: string): void;
+  number?: number;
 }
 
 const CustomListItem = (props: CustomListItemProps) => {
@@ -50,6 +50,53 @@ const CustomListItem = (props: CustomListItemProps) => {
 
   return (
     <View>
+      <ListItem
+        onPress={() => showMenu()}
+        noIndent={true}
+        noBorder={true}
+        style={[
+          styles.container,
+          {backgroundColor: props.backgroundColor, opacity: props.opacity},
+        ]}>
+        <View style={styles.numberContainer}>
+          <Text
+            style={{
+              color: getColor(theme, 'primaryText'),
+              textAlignVertical: 'center',
+              fontWeight: 'bold',
+            }}>
+            {props.number}
+          </Text>
+        </View>
+
+        <View style={styles.textContainer}>
+          <Text
+            style={{
+              color: getColor(theme, 'primaryText'),
+              textAlignVertical: 'center',
+              marginRight: 'auto',
+            }}>
+            {props.text.replace(/^\s+/g, '')}
+          </Text>
+        </View>
+
+        <View style={styles.iconContainer}>
+          <LikeIcon
+            name={props.liked ? 'heart' : 'hearto'}
+            color={getColor(theme, 'primaryOrange')}
+            size={Dimensions.iconMedSmall}
+            onPress={() => props.onToggleLike(props.id)}
+            style={{marginRight: 5}}
+          />
+          <TouchableWithoutFeedback onPressIn={props.onDrag}>
+            <Icon
+              name="drag"
+              color={getColor(theme, 'lightGray')}
+              size={Dimensions.iconMed}
+            />
+          </TouchableWithoutFeedback>
+        </View>
+      </ListItem>
       <View
         style={{
           position: 'absolute',
@@ -84,53 +131,6 @@ const CustomListItem = (props: CustomListItemProps) => {
           </MenuItem>
         </Menu>
       </View>
-      <ListItem
-        onPress={() => showMenu()}
-        noIndent={true}
-        noBorder={true}
-        style={[
-          styles.container,
-          {backgroundColor: props.backgroundColor, opacity: props.opacity},
-        ]}>
-        <View style={styles.numberContainer}>
-          <Text
-            style={{
-              color: getColor(theme, 'primaryText'),
-              textAlignVertical: 'center',
-              fontWeight: 'bold',
-            }}>
-            {props.number}
-          </Text>
-        </View>
-
-        <View style={styles.textContainer}>
-          <Text
-            style={{
-              color: getColor(theme, 'primaryText'),
-              textAlignVertical: 'center',
-              marginRight: 'auto',
-            }}>
-            {props.text.replace(/^\s+/g, '')}
-          </Text>
-        </View>
-
-        <View style={styles.iconContainer}>
-          <LikeIcon
-            name={props.isLiked ? 'heart' : 'hearto'}
-            color={getColor(theme, 'primaryOrange')}
-            size={Dimensions.iconMedSmall}
-            onPress={() => props.onLike(props.id)}
-            style={{marginRight: 5}}
-          />
-          <TouchableWithoutFeedback onPressIn={props.onDrag}>
-            <Icon
-              name="drag"
-              color={getColor(theme, 'lightGray')}
-              size={Dimensions.iconMed}
-            />
-          </TouchableWithoutFeedback>
-        </View>
-      </ListItem>
     </View>
   );
 };
@@ -152,11 +152,11 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   numberContainer: {
-    margin: 5,
-    marginLeft: 0,
+    margin: 0,
     flex: 1,
-
-    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
+    marginLeft: -15,
   },
   numberText: {
     fontWeight: 'bold',

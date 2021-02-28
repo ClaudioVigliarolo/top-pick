@@ -17,32 +17,33 @@ const translations = {
     SETTINGS: "Impostazioni", 
     SEARCH: "Ricerca" ,
     QUESTIONS: "Domande" ,
+    NO_LIKED_QUESTIONS: "Nessuna Domanda Preferita",
     ARRANGE_QUESTIONS: "Ordina le Domande" ,
     IS_TIME:"E' ora di iniziare",
     ADD_YOUR_QUESTION : "Aggiungi Una Domanda",
     NEXT: "Continua",
     SOURCE_TOPICS: "fonte:",
+    UPDATING_QUESTIONS: 'Stiamo aggiornando le domande',
     SELECTED : "Selezionati",
     POPULAR_SEARCHES : "Ricerche più popolari",
-    READY_TO_TALK: "Pronto a Parlare",
+    READY_TO_TALK: "Sono Pronto",
     SEARCH_A_TOPIC: "Cerca un Topic",
     SEARCH_IN : "Cerca in",
     DB_NAME : 'IT',
+    DARK_MODE: 'Tema Scuro',
     START: "Iniziamo!",
     STEP_1_TITLE: 'Step 1: Scegli',
     STEP_1_DESCRIPTION:'Premi su una carta per selezionare il topic',
     SELECT_LANGUAGE: "Seleziona lingua",
     CHANGE_THEME: "Cambia tema", 
-
     STEP_2_TITLE: 'Step 2: Seleziona',
     STEP_2_DESCRIPTION:'Seleziona le domande che preferisci cliccando sul quadratino a destra',
-
+    AUTOMATIC_UPDATE : "Update Automatico",
     STEP_3_TITLE: 'Step 3: Riordina',
     STEP_3_DESCRIPTION:"Metti in ordine le domande che hai scelto trascinando l'icona a destra",
-      
     READY_TO_START:'Siamo pronti ad iniziare!',
+    WAIT_UPDATE:  "Attendi che i topic si aggiornino",
     READY_TO_START_TIP:'TIP: Puoi rivedere questo mini tutorial in ogni momento dalla sezione Impostazioni'
-
   },
   en: {
     PICK_TOPIC: 'Pick a Topic',
@@ -54,6 +55,7 @@ const translations = {
     IS_TIME:"Now Is The Time",
     ADD_YOUR_QUESTION : "Add Your Question",
     NEXT: "Next",
+    DARK_MODE: 'Dark Mode',
     SOURCE_TOPICS: "source:",
     SELECTED : "Selected",
     POPULAR_SEARCHES : "Popular Searches",
@@ -70,13 +72,14 @@ const translations = {
     ARRANGE_QUESTIONS: "Arrange Questions" ,
     DB_NAME : 'EN',
     READY_TO_TALK:'Ready To Talk',
-
+    NO_LIKED_QUESTIONS: "No Liked Questions",
+    AUTOMATIC_UPDATE : "Automatic Update",
     STEP_1_TITLE: 'Step 1: Choose',
     STEP_1_DESCRIPTION:'Simply press on the card to select the topic',
-
+    UPDATING_QUESTIONS: 'updating questions',
     STEP_2_TITLE: 'Step 2: Select',
     STEP_2_DESCRIPTION:'You can Select the questions you like by pressing the little square on the right',
-
+    WAIT_UPDATE:  "Wait while the topics are updating",
     STEP_3_TITLE: 'Step 3: Arrange',
     STEP_3_DESCRIPTION:'You can put the questions in the order you prefer by dragging the icon on the right',
     

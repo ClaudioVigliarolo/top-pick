@@ -14,19 +14,10 @@ import {getColor} from '../constants/Themes';
 import ListItem from '../components/list/ListItemCheckbox';
 import BottomButton from '../components/buttons/BottomButtons';
 import SearchBar from '../components/search/SearchBar';
-import SQLite from 'react-native-sqlite-storage';
 import Clipboard from '@react-native-community/clipboard';
 import CopyAlert from '../components/custom/CopyAlert';
 import Dimensions from '../constants/Dimensions';
-const db = SQLite.openDatabase(
-  {
-    name: 'db.db',
-    location: 'default',
-    createFromLocation: 1,
-  },
-  () => {},
-  () => {},
-);
+import {getDB} from '../utils/utils';
 
 let _listViewOffset = 0;
 
@@ -52,14 +43,13 @@ export default function QuestionsPage({
   const mounted: any = React.useRef();
 
   React.useEffect(() => {
-    db.transaction((tx) => {
+    getDB().transaction((tx) => {
       tx.executeSql(
         `SELECT * from questions${translations.DB_NAME}
           WHERE topic = "${topic.title}";`,
         [],
         (tx, results) => {
           const rows = results.rows;
-
           let newArr = [];
           for (let i = 0; i < rows.length; i++) {
             newArr.push({
@@ -69,7 +59,11 @@ export default function QuestionsPage({
           newArr.forEach(function (element: Question) {
             element['selected'] = false;
           });
+          console.log('mie questioni', newArr);
           setItems(newArr);
+        },
+        (err) => {
+          console.error(err);
         },
       );
     });

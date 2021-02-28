@@ -12,7 +12,7 @@ export const updateTopics = async (date:string, lang:string,setUpdatedContent:(v
       .get(`${HOSTNAME}/topicks/get_updates/${date}/${lang}`)
       .then(async (response) => {
           const data: JSONresponse = response.data;
-          console.log(data);
+          //console.log(data);
           if(data.isUpdated)
           {
               //set the app as updated
@@ -20,13 +20,14 @@ export const updateTopics = async (date:string, lang:string,setUpdatedContent:(v
               setLoadingContent(false);
               return;
           }else
-          {//
-              if(generateDB(response.data,lang))
-              {
+          {
+            const myval =await generateDB(response.data,lang);
+            console.log("my amico",myval)
+              if(myval)
                 setUpdatedContent(true);
-              }else{
+              else
                 setUpdatedContent(false);
-              }
+              
               setLoadingContent(false);
           }
       })

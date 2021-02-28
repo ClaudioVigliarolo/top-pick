@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Text, View, StyleSheet} from 'react-native';
+import {Text, View, StyleSheet, Alert} from 'react-native';
 import ThemeContext from '../context/ThemeContext';
 import AsyncStorage from '@react-native-community/async-storage';
 import SearchBar from '../components/search/SearchBar';
@@ -10,21 +10,12 @@ import CardItem from '../components/list/CardItem';
 import ButtonsSection from '../components/buttons/ButtonsSearchSection';
 import keys from '../../database/keys/keys';
 import SQLite from 'react-native-sqlite-storage';
+import {getDB} from '../utils/utils';
 
 interface Recent {
   topic: string;
   language: any;
 }
-
-const db = SQLite.openDatabase(
-  {
-    name: 'db.db',
-    location: 'default',
-    createFromLocation: 1,
-  },
-  () => {},
-  () => {},
-);
 
 const MAX_RECENTS = 3;
 const MAX_POPULAR = 6;
@@ -52,7 +43,7 @@ const SearchPage = ({navigation}: {navigation: any}) => {
   };
 
   const getPopular = (): void => {
-    db.transaction((tx) => {
+    getDB().transaction((tx) => {
       tx.executeSql(
         `SELECT * from topics${translations.DB_NAME}
         ORDER BY RANDOM()
@@ -76,7 +67,6 @@ const SearchPage = ({navigation}: {navigation: any}) => {
   };
 
   const onChangeRecents = async (newSearch: string) => {
-    console.log('on cchhh recents', newSearch);
     let newRecents: string[] = [];
     //check if contained, if so don't insert and put it to front
     if (recents.includes(newSearch)) {
@@ -130,7 +120,12 @@ const SearchPage = ({navigation}: {navigation: any}) => {
           },
         );
         const recents = recentsArray.filter((el) => el);
-        setRecents(recents);
+
+        const slidedRecents =
+          recents.length > MAX_RECENTS
+            ? recents.slice(0, MAX_RECENTS)
+            : recents;
+        setRecents(slidedRecents);
       }
     } catch (error) {
       // Error retrieving data
@@ -143,11 +138,11 @@ const SearchPage = ({navigation}: {navigation: any}) => {
       return;
     }
 
-    db.transaction((tx) => {
+    getDB().transaction((tx) => {
       tx.executeSql(
         `SELECT * from topics${translations.DB_NAME}
         WHERE title LIKE "%${param}%"
-        LIMIT 3;`,
+        LIMIT ${MAX_RECENTS};`,
         [],
         (tx, results) => {
           const rows = results.rows;

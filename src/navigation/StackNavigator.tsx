@@ -24,8 +24,8 @@ import SettingsPage from '../screens/SettingsPage';
 import UpdateContext from '../context/UpdateContext';
 import {updateTopics} from '../utils/api';
 import {getLastUpdate, getStoredLanguage, isConnected} from '../utils/utils';
-import SelectLanguagePage from '../screens/SelectLanguagePage';
-import ThemePage from '../screens/ThemePage';
+import SelectLanguagePage from '../screens/SettingsLanguagePage';
+import ThemePage from '../screens/SettingsThemePage';
 
 const Stack = createStackNavigator();
 
@@ -227,17 +227,6 @@ const SettingsStack = ({navigation}: {navigation: any}) => {
           headerLeft: () => (
             <BackStructure destination="Settings" navigation={navigation} />
           ),
-          headerRight: () => (
-            <IconChecked
-              name="checkmark-done"
-              color="#fff"
-              onPress={() => {}}
-              size={Dimensions.iconMed}
-              style={{
-                marginRight: 20,
-              }}
-            />
-          ),
         }}
       />
 
@@ -277,6 +266,7 @@ const SettingsStack = ({navigation}: {navigation: any}) => {
 const renderConnectivityIcon = (
   isLoadingContent: boolean,
   isUpdated: boolean,
+  iconColor: string,
   setLoadingContent: (val: boolean) => void,
   setUpdatedContent: (val: boolean) => void,
   setUpdatedAlert: (val: boolean) => void,
@@ -291,7 +281,7 @@ const renderConnectivityIcon = (
     return (
       <IconChecked
         name="checkmark-done"
-        color="#fff"
+        color={iconColor}
         onPress={() => {
           setUpdatedAlert(true);
         }}
@@ -305,7 +295,7 @@ const renderConnectivityIcon = (
     return (
       <IconUpdate
         name="reload"
-        color="#fff"
+        color={iconColor}
         onPress={async () =>
           (await isConnected()) &&
           updateTopics(
@@ -351,11 +341,11 @@ const HomeStack = ({navigation}: {navigation: any}) => {
                   show={isLoadingContent}
                   showProgress={isLoadingContent}
                   progressColor={getColor(theme, 'primaryOrange')}
-                  title="updating topics..."
+                  title={translations.UPDATING_QUESTIONS + '...'}
                   titleStyle={{color: getColor(theme, 'primaryOrange')}}
                   closeOnTouchOutside={false}
                   progressSize={50}
-                  message="Wait until the topics are updating"
+                  message={translations.WAIT_UPDATE}
                   closeOnHardwareBackPress={false}
                   showCancelButton={false}
                   messageStyle={{textAlign: 'center'}}
@@ -382,6 +372,7 @@ const HomeStack = ({navigation}: {navigation: any}) => {
               {renderConnectivityIcon(
                 isLoadingContent,
                 isUpdatedContent,
+                getColor(theme, 'secondaryIcon'),
                 setLoadingContent,
                 setUpdatedContent,
                 setUpdatedAlert,

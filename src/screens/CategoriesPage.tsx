@@ -1,21 +1,11 @@
 import * as React from 'react';
-import {StyleSheet, Alert, ScrollView} from 'react-native';
+import {StyleSheet, ScrollView} from 'react-native';
 import {Category} from '../interfaces/Interfaces';
 import {getColor} from '../constants/Themes';
 import ThemeContext from '../context/ThemeContext';
 import {LocalizationContext} from '../context/LocalizationContext';
 import ListItem from '../components/list/ListItem';
-import SQLite from 'react-native-sqlite-storage';
-
-const db = SQLite.openDatabase(
-  {
-    name: 'db.db',
-    location: 'default',
-    createFromLocation: 1,
-  },
-  () => {},
-  () => {},
-);
+import {getDB} from '../utils/utils';
 
 export default function CategoryList({navigation}: {navigation: any}) {
   const [items, setItems] = React.useState<Category[]>([]);
@@ -23,10 +13,10 @@ export default function CategoryList({navigation}: {navigation: any}) {
   const {translations} = React.useContext(LocalizationContext);
 
   React.useEffect(() => {
-    db.transaction((tx) => {
+    getDB().transaction((tx) => {
       tx.executeSql(
         `SELECT category as title, count(*) as counter
-        from category_topicsEN
+        from category_topics${translations.DB_NAME}
         GROUP BY category;`,
         [],
         (tx, results) => {

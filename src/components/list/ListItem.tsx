@@ -17,7 +17,7 @@ import Dimensions from '../../constants/Dimensions';
 
 interface CustomListItemProps {
   text: string;
-  secondaryText: string | number;
+  secondaryText?: string | number;
   onPress(): void;
   icon: boolean;
 }

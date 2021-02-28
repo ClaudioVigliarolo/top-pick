@@ -7,17 +7,7 @@ import TopicsCarousel from '../components/custom/CustomCarousel';
 import Button from '../components/buttons/CustomButton';
 import Dimensions from '../constants/Dimensions';
 import {getColor} from '../constants/Themes';
-import SQLite from 'react-native-sqlite-storage';
-
-const db = SQLite.openDatabase(
-  {
-    name: 'db.db',
-    location: 'default',
-    createFromLocation: 1,
-  },
-  () => {},
-  () => {},
-);
+import {getDB} from '../utils/utils';
 
 const INITIALS_TOPICS_LOADED = 10;
 const NEW_TOPICS_LOADED = 10;
@@ -38,7 +28,7 @@ const HomePage = ({navigation}: {navigation: any}) => {
   }, [translations.DB_NAME]);
 
   const loadTopics = async (n: number): Promise<void> => {
-    db.transaction((tx) => {
+    getDB().transaction((tx) => {
       tx.executeSql(
         `SELECT * from topics${translations.DB_NAME}
         ORDER BY RANDOM()
@@ -106,6 +96,7 @@ const HomePage = ({navigation}: {navigation: any}) => {
         style={{
           flex: 1,
           alignItems: 'center',
+          minWidth: 250,
           width: '100%',
           marginBottom: Dimensions.tabHeight,
           justifyContent: 'center',

@@ -1,37 +1,18 @@
-import React, {Component} from 'react';
-import {
-  View,
-  TouchableOpacity,
-  Text,
-  Platform,
-  Alert,
-  PermissionsAndroid,
-} from 'react-native';
+import React from 'react';
+import {View, Platform, Alert, PermissionsAndroid} from 'react-native';
 import {Question, Topic} from '../interfaces/Interfaces';
 import {getColor} from '../constants/Themes';
 import {LocalizationContext} from '../context/LocalizationContext';
 import FileViewer from 'react-native-file-viewer';
 import BottomButton from '../components/buttons/BottomButtons';
-import Dimensions from '../constants/Dimensions';
 import ThemeContext from '../context/ThemeContext';
 import ListItemDrag from '../components/list/ListItemDrag';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import BottomsDownToUp from '../components/buttons/BottomsDownToUp';
 import AddBar from '../components/custom/AddBar';
-
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import SQLite from 'react-native-sqlite-storage';
 import EditOverlay from '../components/custom/EditOverlay';
-
-const db = SQLite.openDatabase(
-  {
-    name: 'db.db',
-    location: 'default',
-    createFromLocation: 1,
-  },
-  () => {},
-  () => {},
-);
+import {getDB, hashCode} from '../utils/utils';
 
 const getQuestionHtml = (items: Question[], title: string) => {
   const htmlContent = `
@@ -127,8 +108,8 @@ export default function OrderPage({
         number={index + 1}
         text={item.title}
         isActive={isActive}
-        isLiked={item.isLiked}
-        onLike={onLike}
+        liked={item.liked}
+        onToggleLike={onToggleLike}
         id={item.id}
         backgroundColor={getColor(theme, 'primaryBackground')}
         opacity={isActive ? 0.7 : 1}
@@ -142,10 +123,10 @@ export default function OrderPage({
     if (index != -1) {
       newItems[index].title = editedQuestion;
       //update question in db
-      db.transaction((tx) => {
+      getDB().transaction((tx) => {
         tx.executeSql(
           `UPDATE "questions${translations.DB_NAME}"
-          SET title = "${editedQuestion}"
+          SET title = "${editedQuestion}" , user_modified = 1
           WHERE "id" = ${questionId}`,
           [],
           (tx, results) => {
@@ -158,18 +139,20 @@ export default function OrderPage({
       });
     }
   };
-
+  //, user_modified = ${newVal ? 1 : 0}
   const onQuestionAdd = () => {
-    db.transaction((tx) => {
+    console.log('1ui', topic.title, questionText);
+    const id = hashCode(questionText);
+    getDB().transaction((tx) => {
       tx.executeSql(
         `INSERT INTO "questions${translations.DB_NAME}"
-         VALUES (null, "${topic.title}", "${questionText}", 0)`,
+         VALUES (${id}, "${topic.title}", "${questionText}", 0, 1)`,
         [],
         (tx, results) => {
-          const question_id = results.insertId;
+          console.log(questionId);
           const newQuestionItem: Question = {
-            id: question_id,
-            isLiked: false,
+            id,
+            liked: false,
             selected: false,
             title: questionText,
           };
@@ -219,22 +202,24 @@ export default function OrderPage({
     }
   };
 
-  const onLike = (id: number) => {
+  const onToggleLike = (id: number) => {
     let itemsCopy = [...items];
     const index = items.findIndex((item) => item.id == id);
-    const newVal = !items[index].isLiked;
-    db.transaction((tx) => {
+    const newVal = !items[index].liked;
+    console.log(newVal, id);
+    getDB().transaction((tx) => {
       tx.executeSql(
         `UPDATE "questions${translations.DB_NAME}"
         SET liked = ${newVal ? 1 : 0}
         WHERE "id" = ${id}`,
         [],
         (tx, results) => {
-          items[index].isLiked = newVal;
+          console.log(results.rows);
+          items[index].liked = newVal;
           setItems(itemsCopy.slice());
         },
         (err) => {
-          console.log(err);
+          console.log('errr', err);
         },
       );
     });

@@ -12,11 +12,12 @@ import {View, StyleSheet, TouchableWithoutFeedback} from 'react-native';
 import ThemeContext from '../../context/ThemeContext';
 import {getColor} from '../../constants/Themes';
 import CheckBox from '@react-native-community/checkbox';
+import Dimensions from '../../constants/Dimensions';
 
 interface ListItemCheckBoxProps {
   text: string;
   value: boolean;
-  onPress(): void;
+  onPress?(): void;
   onValChange: any;
 }
 
@@ -27,7 +28,11 @@ const ListItemCheckBox = (props: ListItemCheckBoxProps) => {
     <ListItem style={styles.container}>
       <TouchableWithoutFeedback onPress={props.onPress}>
         <View style={styles.textContainer}>
-          <Text style={{color: getColor(theme, 'primaryText')}}>
+          <Text
+            style={{
+              color: getColor(theme, 'primaryText'),
+              fontSize: Dimensions.fontList,
+            }}>
             {props.text.replace(/\s+/g, ' ').trim()}
           </Text>
         </View>

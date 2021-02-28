@@ -23,6 +23,9 @@ MIN_CHAR = 2
 # topics source
 DEF_SOURCE = "ESL, TopPicks"
 
+# number of digits to hash questions
+HASH_DIGITS = 10
+
 # should be contained in categories file
 DEF_CATEG = get_category("all", LANG_PREFIX)
 
@@ -82,7 +85,7 @@ curs.execute('''CREATE TABLE questions'''+LANG_PREFIX + ''' (
 	"title"	TEXT,
 	"liked"	NUMERIC DEFAULT 0,
 	"user_modified" NUMERIC DEFAULT 0,
-	FOREIGN KEY("topic") REFERENCES "topics"("title"),
+	FOREIGN KEY("topic") REFERENCES "topics'''+LANG_PREFIX+'''" ("title"),
 	PRIMARY KEY("id", "topic")
 )''')
 
@@ -95,7 +98,7 @@ for topic_item_path in os.listdir(topics_path):
             for line in file_in:
                 if get_topic(topic, LANG_PREFIX) and line not in questions_list:
                     questions_list.append(line)
-                    hashed_id = hash(line)
+                    hashed_id = abs(hash(line)) % (10 ** HASH_DIGITS)
                     curs.execute('''INSERT INTO questions'''+LANG_PREFIX + ''' (id, topic, title)
                             values (?,?,?)''',
                                  (hashed_id, get_topic(topic, LANG_PREFIX), line))

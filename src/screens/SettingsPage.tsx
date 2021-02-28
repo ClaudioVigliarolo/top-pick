@@ -1,57 +1,33 @@
 import * as React from 'react';
-import {
-  StyleSheet,
-  Alert,
-  View,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {getColor} from '../constants/Themes';
 import {LocalizationContext} from '../context/LocalizationContext';
 import ThemeContext from '../context/ThemeContext';
-import Dimensions from '../constants/Dimensions';
-import ListItem from '../components/list/ListItem';
 import SQLite from 'react-native-sqlite-storage';
-import Picker from '../components/custom/LanguagePicker';
+import ListItem from '../components/list/ListItem';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import AsyncStorage from '@react-native-community/async-storage';
 import ListItemCheckBox from '../components/list/ListItemCheckbox';
+import keys from '../../database/keys/keys';
+import {getUpdateSettings} from '../utils/utils';
 
-const db = SQLite.openDatabase(
-  {
-    name: 'db.db',
-    location: 'default',
-    createFromLocation: 1,
-  },
-  () => {},
-  () => {},
-);
-
-export default function CategoryList({navigation}: {navigation: any}) {
+export default function SettingsPage({navigation}: {navigation: any}) {
   const [isAlert, setAlert] = React.useState<boolean>(false);
-  const {translations, appLanguage, setAppLanguage} = React.useContext(
-    LocalizationContext,
-  );
+  const [isUpdate, setUpdate] = React.useState<boolean>(false);
 
-  const handleSetLanguage = async (language: string) => {
-    setAppLanguage(language);
-  };
+  React.useEffect(() => {
+    (async () => {
+      console.log('figs2!');
+      setUpdate(await getUpdateSettings());
+    })();
+  }, []);
+
+  const {translations} = React.useContext(LocalizationContext);
 
   const {theme} = React.useContext(ThemeContext);
-  React.useEffect(() => {}, []); // Only re-run the effect if co unt changes
 
   const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      flexDirection: 'column',
-      backgroundColor: getColor(theme, 'primaryBackground'),
-    },
-
-    text: {
-      color: getColor(theme, 'primaryOrange'),
-      textAlign: 'center',
-      fontSize: Dimensions.fontMed,
-    },
+    container: {},
   });
 
   const showAlert = () => {
@@ -59,7 +35,7 @@ export default function CategoryList({navigation}: {navigation: any}) {
   };
 
   const resetDB = (): void => {
-    /*   SQLite.deleteDatabase(
+    SQLite.deleteDatabase(
       {name: 'db.db', location: 'default'},
       () => {
         console.log('second db deleted');
@@ -67,11 +43,19 @@ export default function CategoryList({navigation}: {navigation: any}) {
       () => {
         console.log('ERROR');
       },
-    ); */
+    );
 
     AsyncStorage.clear();
   };
 
+  const setUpdateSettings = async (newVal: boolean) => {
+    AsyncStorage.setItem(keys.SETTINGS_UPDATE, newVal.toString()).then(() => {
+      setUpdate(newVal);
+    });
+  };
+  {
+    console.log('vvvvvv', isUpdate);
+  }
   return (
     <View
       style={{
@@ -80,21 +64,22 @@ export default function CategoryList({navigation}: {navigation: any}) {
         backgroundColor: getColor(theme, 'primaryBackground'),
       }}>
       <ListItem
-        text="Language"
+        text={translations.SELECT_LANGUAGE}
         onPress={() => {
           navigation.navigate('Language');
         }}
         icon={false}
-        secondaryText=""
       />
 
-      <ListItem
-        text="Reset To Default"
-        onPress={showAlert}
-        icon={false}
-        secondaryText=""
+      <ListItem text="Reset To Default" onPress={showAlert} icon={false} />
+
+      <ListItemCheckBox
+        text={translations.AUTOMATIC_UPDATE}
+        value={isUpdate}
+        onValChange={(newVal: boolean) => setUpdateSettings(newVal)}
       />
 
+      {/*
       <ListItem
         text="Cards Theme"
         onPress={showAlert}
@@ -104,14 +89,7 @@ export default function CategoryList({navigation}: {navigation: any}) {
         icon={false}
         secondaryText=""
       />
-
-      <ListItemCheckBox
-        text="automatic update"
-        onPress={showAlert}
-        value={true}
-        onValChange={() => {}}
-        secondaryText=""
-      />
+*/}
 
       {isAlert && (
         <AwesomeAlert

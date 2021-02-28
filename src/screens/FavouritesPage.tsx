@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {StyleSheet, Alert, View, ScrollView} from 'react-native';
+import {useIsFocused} from '@react-navigation/native';
 import {List, Text} from 'native-base';
 import {Question} from '../interfaces/Interfaces';
 import {getColor} from '../constants/Themes';
@@ -23,13 +24,14 @@ const db = SQLite.openDatabase(
 
 export default function CategoryList({navigation}: {navigation: any}) {
   const [items, setItems] = React.useState<Question[]>([]);
+  const isFocused = useIsFocused();
   const [isLoading, setLoading] = React.useState<boolean>(true);
   const {translations} = React.useContext(LocalizationContext);
 
   const {theme} = React.useContext(ThemeContext);
   React.useEffect(() => {
     getItems();
-  }, [items.length]); // Only re-run the effect if count changes
+  }, [isFocused]); // Only re-run the effect if count changes
 
   const getItems = () => {
     db.transaction((tx) => {
@@ -61,11 +63,11 @@ export default function CategoryList({navigation}: {navigation: any}) {
 
   const onDislike = (id: number) => {
     const index = items.findIndex((item) => item.id == id);
-    const newVal = !items[index].isLiked;
+    const newVal = !items[index].liked;
     db.transaction((tx) => {
       tx.executeSql(
         `UPDATE "questions${translations.DB_NAME}"
-        SET liked = ${newVal ? 1 : 0}
+        SET liked = 0
         WHERE "id" = ${id}`,
         [],
         (tx, results) => {
@@ -89,15 +91,12 @@ export default function CategoryList({navigation}: {navigation: any}) {
     return (
       <ListItemDrag
         onRemove={onRemove}
-        // onLongPress={drag}
-        onEdit={() => {}}
-        onDrag={() => {}}
+        onDrag={drag}
         text={item.title}
-        number={index + 1}
         isActive={isActive}
-        isLiked={item.isLiked}
+        liked={item.liked}
         id={item.id}
-        onLike={onDislike}
+        onToggleLike={onDislike}
         backgroundColor={getColor(theme, 'primaryBackground')}
         opacity={isActive ? 0.6 : 1}
       />
@@ -126,7 +125,7 @@ export default function CategoryList({navigation}: {navigation: any}) {
         backgroundColor: getColor(theme, 'primaryBackground'),
       }}>
       {!isLoading && items.length == 0 && (
-        <Text style={styles.text}>No Liked Questions</Text>
+        <Text style={styles.text}>{translations.NO_LIKED_QUESTIONS}</Text>
       )}
       {items.length > 0 && (
         <DraggableFlatList

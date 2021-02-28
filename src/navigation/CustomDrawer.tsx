@@ -25,6 +25,7 @@ import {getColor} from '../constants/Themes';
 
 import Dimensions from '../constants/Dimensions';
 import keys from '../../database/keys/keys';
+import translations from '../context/translations';
 
 const CustomDrawer = ({progress, ...props}: {progress: number; props: any}) => {
   const {theme, setTheme} = React.useContext(ThemeContext);
@@ -87,7 +88,7 @@ const CustomDrawer = ({progress, ...props}: {progress: number; props: any}) => {
                   color: getColor(theme, 'drawerGrey'),
                   paddingRight: 20,
                 }}>
-                Dark Mode
+                {translations.DARK_MODE}
               </Text>
               <Switch
                 onValueChange={changeTheme}

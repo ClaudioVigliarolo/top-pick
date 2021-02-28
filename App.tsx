@@ -15,13 +15,12 @@ import UpdateContext from './src/context/UpdateContext';
 import {
   getLastUpdate,
   getStoredLanguage,
+  getUpdateSettings,
   isConnected,
   readTheme,
 } from './src/utils/utils';
-import Loader from './src/components/custom/Loader';
 
 // 0: loading, 1: already launched, 2: firstLaunch
-
 const App = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [theme, setStateTheme] = React.useState<string>('light');
@@ -42,9 +41,9 @@ const App = () => {
   const [isFirstLaunch, setFirstLaunch] = React.useState(false);
 
   React.useEffect(() => {
-    async () => {
+    (async () => {
       setStateTheme(await readTheme());
-    };
+    })();
 
     (async () => {
       configureLanguage();
@@ -55,13 +54,14 @@ const App = () => {
     })();
 
     (async () => {
-      /* (await isConnected()) &&
+      (await getUpdateSettings()) &&
+        (await isConnected()) &&
         (await updateTopics(
           await getLastUpdate(),
           await getStoredLanguage(),
           setUpdatedContent,
           setLoadingContent,
-        ));*/
+        ));
     })();
 
     (async () => {
