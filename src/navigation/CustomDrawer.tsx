@@ -88,7 +88,9 @@ const CustomDrawer = ({progress, ...props}: {progress: number; props: any}) => {
                   color: getColor(theme, 'drawerGrey'),
                   paddingRight: 20,
                 }}>
-                {translations.DARK_MODE}
+                {theme == 'dark'
+                  ? translations.LIGHT_MODE
+                  : translations.DARK_MODE}
               </Text>
               <Switch
                 onValueChange={changeTheme}

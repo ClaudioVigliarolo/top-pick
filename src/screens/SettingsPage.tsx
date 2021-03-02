@@ -53,9 +53,7 @@ export default function SettingsPage({navigation}: {navigation: any}) {
       setUpdate(newVal);
     });
   };
-  {
-    console.log('vvvvvv', isUpdate);
-  }
+
   return (
     <View
       style={{
@@ -71,17 +69,8 @@ export default function SettingsPage({navigation}: {navigation: any}) {
         icon={false}
       />
 
-      <ListItem text="Reset To Default" onPress={showAlert} icon={false} />
-
-      <ListItemCheckBox
-        text={translations.AUTOMATIC_UPDATE}
-        value={isUpdate}
-        onValChange={(newVal: boolean) => setUpdateSettings(newVal)}
-      />
-
-      {/*
       <ListItem
-        text="Cards Theme"
+        text={translations.CHANGE_THEME}
         onPress={showAlert}
         onPress={() => {
           navigation.navigate('Theme');
@@ -89,7 +78,13 @@ export default function SettingsPage({navigation}: {navigation: any}) {
         icon={false}
         secondaryText=""
       />
-*/}
+      <ListItemCheckBox
+        text={translations.AUTOMATIC_UPDATE}
+        value={isUpdate}
+        onValChange={(newVal: boolean) => setUpdateSettings(newVal)}
+      />
+
+      <ListItem text="Reset To Default" onPress={showAlert} icon={false} />
 
       {isAlert && (
         <AwesomeAlert

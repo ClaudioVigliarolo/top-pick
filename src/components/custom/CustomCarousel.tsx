@@ -8,6 +8,9 @@ import {getColor} from '../../constants/Themes';
 import Dimensions from '../../constants/Dimensions';
 
 import {scrollInterpolator, animatedStyles} from '../../utils/animations';
+import keys from '../../../database/keys/keys';
+import AsyncStorage from '@react-native-community/async-storage';
+import {useIsFocused} from '@react-navigation/native';
 
 //const ITEM_HEIGHT = Math.round((ITEM_WIDTH * 4) / 4);
 const colorsData = require('../../constants/card_templates.json');
@@ -23,21 +26,29 @@ const DATA = [];
 for (let i = 0; i < 10; i++) {
   DATA.push(i);
 }
+
 const TopicCarousel = React.forwardRef((props: CarouselProps, ref) => {
-  const {theme} = React.useContext(ThemeContext);
   const [colors, setColors] = React.useState<string[]>([]);
+  const isFocused = useIsFocused();
   const [color, setColor] = React.useState<string>('');
   const [width, setWidth] = React.useState<number>(Dim.get('window').width);
   const [height, setheight] = React.useState<number>(Dim.get('window').height);
 
   React.useEffect(() => {
-    setRandomColors();
+    (async () => {
+      let theme = await AsyncStorage.getItem(keys.CARDS_THEME);
+      console.log('uuu', theme);
+
+      theme = theme ? theme : 'default';
+      setRandomColors(theme);
+    })();
+
     Dim.addEventListener('change', (e) => {
       const {width, height} = e.window;
       setWidth(width);
       setheight(height);
     });
-  }, []);
+  }, [isFocused]);
 
   const itemWidth = width * Dimensions.CAROUSEL_ITEM_WIDTH_FACTOR;
   const itemHeight = height * Dimensions.CAROUSEL_ITEM_HEIGHT_FACTOR;
@@ -70,8 +81,8 @@ const TopicCarousel = React.forwardRef((props: CarouselProps, ref) => {
     );
   };
 
-  const setRandomColors = (): void => {
-    const colors = colorsData[getColor(theme, 'type')];
+  const setRandomColors = (theme: string): void => {
+    const colors = colorsData[theme];
     let randomIndex = Math.floor(Math.random() * colors.length);
     setColors(colors);
     setColor(colors[randomIndex]);
@@ -82,6 +93,7 @@ const TopicCarousel = React.forwardRef((props: CarouselProps, ref) => {
 
   const getRandomColor = (): void => {
     let newcolor = color;
+    if (colors.length == 1) setColor(color);
     while (newcolor == color) {
       let randomIndex = Math.floor(Math.random() * colors.length);
       newcolor = colors[randomIndex];

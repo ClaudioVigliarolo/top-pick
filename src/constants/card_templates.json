@@ -1,3 +1,9 @@
 
-{"dark" : ["#ffc100","#ff9a00", "#ff7400", "#ff0000", "#ff4d00"] ,
- "light" :["#ffc100","#ff9a00", "#ff7400", "#ff0000", "#ff4d00"]}
+{"default" : ["#ffc100","#ff9a00", "#ff7400", "#ff6a00", "#ff0000", "#ff4d00"],
+ "orange" :["orange"],
+ "red" :["#ff0000"],
+ "blue" :["#40a8c4"],
+ "green" :["#00af91"],
+ "violet" :["#7868e6"]
+
+}

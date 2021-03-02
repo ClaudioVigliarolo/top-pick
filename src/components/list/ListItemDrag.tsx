@@ -10,12 +10,19 @@ import {
 } from 'native-base';
 import Clipboard from '@react-native-community/clipboard';
 import ThemeContext from '../../context/ThemeContext';
-import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
-import {View, StyleSheet, TouchableWithoutFeedback, Alert} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
 import {getColor} from '../../constants/Themes';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LikeIcon from 'react-native-vector-icons/AntDesign';
 import Dimensions from '../../constants/Dimensions';
+import Modal from 'react-native-modal';
+import translations from '../../context/translations';
 
 interface CustomListItemProps {
   id: number;
@@ -32,26 +39,17 @@ interface CustomListItemProps {
 }
 
 const CustomListItem = (props: CustomListItemProps) => {
-  let _menu = React.useRef(null);
   const {theme} = React.useContext(ThemeContext);
-  const [isAlert, setAlert] = React.useState<boolean>(false);
+  const [isModalVisible, setModalVisible] = React.useState(false);
 
-  const setMenuRef = (ref: any) => {
-    _menu = ref;
-  };
-
-  const hideMenu = () => {
-    _menu.hide();
-  };
-
-  const showMenu = () => {
-    _menu.show();
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
   };
 
   return (
     <View>
       <ListItem
-        onPress={() => showMenu()}
+        onPress={toggleModal}
         noIndent={true}
         noBorder={true}
         style={[
@@ -107,29 +105,59 @@ const CustomListItem = (props: CustomListItemProps) => {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <Menu ref={setMenuRef}>
-          <MenuItem
-            onPress={() => {
-              hideMenu();
-              Clipboard.setString(props.text);
+        <Modal isVisible={isModalVisible}>
+          <TouchableOpacity
+            style={styles.modalContainer}
+            activeOpacity={1}
+            onPressOut={() => {
+              setModalVisible(false);
             }}>
-            Copy
-          </MenuItem>
-          <MenuItem
-            onPress={() => {
-              hideMenu();
-              props.onEdit(props.id, props.text);
-            }}>
-            Edit
-          </MenuItem>
-          <MenuItem
-            onPress={() => {
-              hideMenu();
-              props.onRemove(props.id);
-            }}>
-            Remove
-          </MenuItem>
-        </Menu>
+            <TouchableOpacity style={styles.modalItemContainer}>
+              <TouchableOpacity
+                style={styles.modalItem}
+                onPress={() => {
+                  toggleModal();
+                  Clipboard.setString(props.text);
+                }}>
+                <Text style={styles.modalText}>{translations.COPY}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalItem}
+                onPress={() => {
+                  toggleModal();
+                  props.onEdit && props.onEdit(props.id, props.text);
+                }}>
+                <Text style={styles.modalText}>{translations.EDIT}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalItem}
+                onPress={() => {
+                  toggleModal();
+                  props.onToggleLike(props.id);
+                }}>
+                <Text style={styles.modalText}>
+                  {props.liked
+                    ? translations.REMOVE_FAVOURITE
+                    : translations.ADD_FAVOURITE}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalItem}
+                onPress={() => {
+                  toggleModal();
+                  props.onRemove(props.id);
+                }}>
+                <Text style={styles.modalText}>{translations.REMOVE}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalItem} onPress={toggleModal}>
+                <Text style={styles.modalText}>{translations.CLOSE}</Text>
+              </TouchableOpacity>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </Modal>
       </View>
     </View>
   );
@@ -158,26 +186,33 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginLeft: -15,
   },
-  numberText: {
-    fontWeight: 'bold',
-  },
+
   iconContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     flex: 2,
   },
-  editing: {
-    width: '100%',
-    textAlignVertical: 'center',
-    color: 'white',
+
+  modalItem: {
+    justifyContent: 'flex-start',
+    padding: 10,
+    paddingLeft: 20,
   },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'red',
+  modalItemContainer: {
+    backgroundColor: 'white',
+    borderRadius: 2,
+    alignSelf: 'center',
+    width: Dimensions.MODAL_WIDTH,
+  },
+  modalText: {
+    alignSelf: 'baseline',
+    fontWeight: '100',
+    textTransform: 'capitalize',
+  },
+  modalContainer: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
   },
 });

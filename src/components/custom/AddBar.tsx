@@ -27,6 +27,11 @@ const AddBar = (props: AddBarProps) => {
         style={{backgroundColor: getColor(theme, 'barExternalColor')}}>
         <Item style={{backgroundColor: getColor(theme, 'barColor')}}>
           <IconAdd
+            onPress={() => {
+              if (props.text.length < MIN_QUESTION_LEN) return false;
+              props.onAdd();
+              props.setText('');
+            }}
             name="add"
             size={Dimensions.iconMed}
             style={{paddingLeft: 10}}

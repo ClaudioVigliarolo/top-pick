@@ -246,17 +246,6 @@ const SettingsStack = ({navigation}: {navigation: any}) => {
           headerLeft: () => (
             <BackStructure destination="Settings" navigation={navigation} />
           ),
-          headerRight: () => (
-            <IconChecked
-              name="checkmark-done"
-              color="#fff"
-              onPress={() => {}}
-              size={Dimensions.iconMed}
-              style={{
-                marginRight: 20,
-              }}
-            />
-          ),
         }}
       />
     </Stack.Navigator>
@@ -342,7 +331,10 @@ const HomeStack = ({navigation}: {navigation: any}) => {
                   showProgress={isLoadingContent}
                   progressColor={getColor(theme, 'primaryOrange')}
                   title={translations.UPDATING_QUESTIONS + '...'}
-                  titleStyle={{color: getColor(theme, 'primaryOrange')}}
+                  titleStyle={{
+                    color: getColor(theme, 'primaryOrange'),
+                    textAlign: 'center',
+                  }}
                   closeOnTouchOutside={false}
                   progressSize={50}
                   message={translations.WAIT_UPDATE}

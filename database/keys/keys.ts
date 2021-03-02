@@ -1,7 +1,7 @@
 
 
 export default {
-    STORAGE_KEY : "@save_age",
+    CARDS_THEME : "@cards_theme",
     LANGUAGE_KEY : "@lang",
     RECENT_SEARCH_KEY:'@recent_search',
     THEME_KEY:'@theme',

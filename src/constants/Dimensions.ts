@@ -18,6 +18,8 @@ export default {
     bottomButtonsHeight: 60,
     SCREEN_WIDTH: Dimensions.get('window').width,
     SCREEN_HEIGHT: Dimensions.get('window').height,
+    MODAL_WIDTH: 250,
+
     bottomModalHeight: Dimensions.get('window').height * 0.21,
     CAROUSEL_ITEM_HEIGHT_FACTOR: 0.55,
     CAROUSEL_ITEM_WIDTH_FACTOR : 0.88,
