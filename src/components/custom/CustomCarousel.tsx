@@ -52,7 +52,7 @@ const TopicCarousel = React.forwardRef((props: CarouselProps, ref) => {
 
   const itemWidth = width * Dimensions.CAROUSEL_ITEM_WIDTH_FACTOR;
   const itemHeight = height * Dimensions.CAROUSEL_ITEM_HEIGHT_FACTOR;
-  let _carousel = {};
+  let _carousel: any = {};
 
   React.useImperativeHandle(ref, () => ({
     validate() {},
@@ -92,13 +92,13 @@ const TopicCarousel = React.forwardRef((props: CarouselProps, ref) => {
   };
 
   const getRandomColor = (): void => {
-    let newcolor = color;
+    /* let newcolor = color;
     if (colors.length == 1) setColor(color);
     while (newcolor == color) {
       let randomIndex = Math.floor(Math.random() * colors.length);
       newcolor = colors[randomIndex];
     }
-    setColor(newcolor);
+    setColor(newcolor);*/
   };
 
   const styles = StyleSheet.create({

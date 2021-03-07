@@ -44,3 +44,12 @@ export interface Category {
     isUpdated:boolean
   
   };
+
+
+  export interface Report {
+    id: number;
+    topic:string;
+    reason:string;
+  }
+
+  

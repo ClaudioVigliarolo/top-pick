@@ -1,3 +1,5 @@
+
+//"#ff9a00", "#ff7400", "#ff6a00", "#ff0000", "#ff4d00"
 interface Colors{
     type:string,                   
     primaryOrange:string,                    

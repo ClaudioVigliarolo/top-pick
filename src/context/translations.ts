@@ -60,7 +60,10 @@ const translations = {
     VIOLET: 'viola',
     DEFAULT: 'default',
 
-
+    REASON_TRANSLATION: 'cattiva traduzione',
+    REASON_PERTINENCE: 'non pertinente',
+    REASON_SCURRILOUS: 'linguaggio scurrile',
+    REASON_OTHERS: 'altro',
   },
   en: {
     PICK_TOPIC: 'Pick a Topic',
@@ -116,6 +119,15 @@ const translations = {
     ORANGE: 'orange',
     VIOLET: 'violet',
     DEFAULT: 'default',
+
+    REASON_TRANSLATION: 'bad translation',
+    REASON_PERTINENCE: 'not pertinenet',
+    REASON_SCURRILOUS: 'rough language',
+    REASON_OTHERS: 'something else',
+
+
+    
+
   },
 
 };

@@ -30,14 +30,8 @@ const App = () => {
   const [isUpdatedContent, setStateUpdatedContent] = React.useState<boolean>(
     false,
   );
-  const {
-    translations,
-    appLanguage,
-    configureLanguage,
-    setAppLanguage,
-  } = React.useContext(LocalizationContext);
+  const {configureLanguage} = React.useContext(LocalizationContext);
 
-  const [language, setLanguage] = React.useState('');
   const [isFirstLaunch, setFirstLaunch] = React.useState(false);
 
   React.useEffect(() => {
@@ -117,7 +111,13 @@ const App = () => {
         <MenuProvider>
           <LocalizationProvider>
             <SafeAreaProvider>
-              <Navigation />
+              <SafeAreaProvider>
+                {isFirstLaunch ? (
+                  <StartSlides onDone={() => setFirstLaunch(false)} />
+                ) : (
+                  <Navigation />
+                )}
+              </SafeAreaProvider>
             </SafeAreaProvider>
           </LocalizationProvider>
         </MenuProvider>

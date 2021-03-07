@@ -1,5 +1,5 @@
 import axios from "axios";
-import { JSONresponse } from "../interfaces/Interfaces";
+import { JSONresponse, Report } from "../interfaces/Interfaces";
 import { generateDB } from "./utils";
 
 const HOSTNAME ="https://topicks-dashboard.herokuapp.com";
@@ -12,7 +12,7 @@ export const updateTopics = async (date:string, lang:string,setUpdatedContent:(v
       .get(`${HOSTNAME}/topicks/get_updates/${date}/${lang}`)
       .then(async (response) => {
           const data: JSONresponse = response.data;
-          //console.log(data);
+          console.log(data);
           if(data.isUpdated)
           {
               //set the app as updated
@@ -38,3 +38,20 @@ export const updateTopics = async (date:string, lang:string,setUpdatedContent:(v
         console.log("CANNOT FETCH DATA "+err)
     }
   }
+
+
+
+  export const addReport = async (report:Report, lang:string):Promise<boolean> => {
+    try{
+      let response = await  axios
+      .post(`${HOSTNAME}/topicks/add_report`, {
+        report,
+        lang
+      });
+        return response.status == 200;
+    } catch(err){
+      console.log(err)
+        return false;
+    }
+  }
+  

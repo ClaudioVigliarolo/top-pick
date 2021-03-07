@@ -111,101 +111,6 @@ export const getStoredLanguage = async ():Promise<string> => {
   }
 };
 
-
-  export const generateDB2= async (data:JSONresponse,DB_PREFIX:string):Promise<boolean>=>{
-      console.log("start generate")
-      try{
-        //delete all categories
-        await db.transaction((tx) => { 
-            tx.executeSql('delete from categories'+DB_PREFIX)
-          });
-
-          //insert new categories
-        await Promise.all([...data.categories.map(async (categ:Category) => {
-            await db.transaction((tx) => { 
-                tx.executeSql(        
-                  `INSERT INTO categories${DB_PREFIX} (title) VALUES (?)`,
-                  [categ.title],
-                  (tx, results) => {               
-                    if (results.rowsAffected > 0 ) {
-                      console.log('Insert SUCCESS CATEG');              
-                    } else {
-                      console.log('Insert FAILED');
-                    }
-                  })}) })])
-    
-        //delete all topics
-        await db.transaction((tx) => { 
-          tx.executeSql('delete from topics'+DB_PREFIX)
-        });
-
-        //insert new topics
-        await Promise.all([...data.topics.map(async (topic:Topic) => {
-          await db.transaction((tx) => { 
-            tx.executeSql(        
-              `INSERT INTO topics${DB_PREFIX} (title,source) VALUES (?,?)`,
-              [topic.title,topic.source],
-              (tx, results) => {               
-                if (results.rowsAffected > 0 ) {
-                  console.log('Insert SUCCESS TOPP');              
-                } else {
-                  console.log('Insert FAILED');
-                }
-              })}) })])
-
-
-           console.log("finish 1")
-
-        //delete category topics table
-        await db.transaction((tx) => { 
-          tx.executeSql('delete from category_topics'+DB_PREFIX)
-        });
-
-        //insert new category topics table
-        await Promise.all([...data.category_topics.map(async (topic:CategoryTopic) => {
-          await db.transaction((tx) => { 
-            tx.executeSql(        
-              `INSERT INTO category_topics${DB_PREFIX} (category, topic) VALUES (?,?)`,
-              [topic.category,topic.topic],
-              (tx, results) => {               
-                if (results.rowsAffected > 0 ) {
-                  console.log('Insert SUCCESS ENTR');              
-                } else {
-                  console.log('Insert FAILED');
-                }
-              })}) })])
-
-          console.log("finish 2")
-          console.log("updated category topics")
-          //delete questions NOT modified by user
-          db.transaction((tx) => { 
-            tx.executeSql(`delete from questions${DB_PREFIX} WHERE user_modified IN (0)`)
-          });
-
-          //insert new questions
-         Promise.all([...data.questions.map(async (question:Question) => {
-            await db.transaction((tx) => { 
-              tx.executeSql(        
-                `INSERT OR IGNORE INTO questions${DB_PREFIX} (id, topic,title) VALUES (?,?,?)`,
-                [question.id,question.topic, question.title],
-                (tx, results) => {               
-                  if (results.rowsAffected > 0 ) {
-                    console.log('Insert SUCCESS QQQ');              
-                  } else {
-                    console.log('Insert FAILED');
-                  }
-                })}) })]).then(()=>console.log("finish 77"))
-        console.log("finish 3")
-         return true;
-      }catch(e)
-      {
-         return false;
-      }
-    }
-      
-
-
-
   export const generateDB= async (data:JSONresponse,DB_PREFIX:string):Promise<boolean>=>{
     console.log("start generate")
       try{
@@ -235,11 +140,18 @@ export const getStoredLanguage = async ():Promise<string> => {
            await db.transaction((tx) => { 
             tx.executeSql('delete from category_topics'+DB_PREFIX)
           });
+
+
   
           //insert new category topics table
           await Promise.all([...data.category_topics.map(async (categTopic:CategoryTopic) => {
             await addCategTopic(categTopic, DB_PREFIX)
           })])
+
+              //delete questions table
+             await db.transaction((tx) => { 
+              tx.executeSql(`delete from questions${DB_PREFIX} WHERE user_modified IN (0)`)
+            });
 
 
           //insert new questions
@@ -267,6 +179,7 @@ export const getStoredLanguage = async ():Promise<string> => {
           })})
   });
 }
+
 
 async function addCategory (categ:Category, DB_PREFIX: string)  {
   return new Promise<void>((resolve, reject) => {
@@ -313,3 +226,4 @@ async function addCategTopic (categTopic:CategoryTopic, DB_PREFIX: string)  {
         console.log("CONNN"+state.isConnected)
         return state.isConnected? true:false;
      }
+

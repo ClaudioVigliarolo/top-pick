@@ -16,7 +16,7 @@ romance
 holidays
 '''
 
-#category => topic
+# category => topic
 conn = connect('/Users/claudio/Documents/currentDB2.db')
 curs = conn.cursor()
 category = sys.argv[1]
@@ -24,16 +24,16 @@ category = sys.argv[1]
 topics = sys.argv
 
 
-#create categories
+# create categories
 
 
-#create categories table
+# create categories table
 curs.execute('''CREATE TABLE "categoriesEN" (
 	"title"	TEXT,
 	PRIMARY KEY("title")''')
 
 
-#create topics table
+# create topics table
 curs.execute('''CREATE TABLE "topicsEN" (
 	"title"	TEXT,
     "source" TEXT,
@@ -43,31 +43,30 @@ curs.execute('''CREATE TABLE "topicsEN" (
 # "all" category: always put here
 curs.execute('''INSERT INTO category_topics (category, topic)
                 values (?,?)''',
-                ("all", topic))
+             ("all", topic))
 
 
 for i in range(2, len(topics)):
     curs.execute('''INSERT INTO topics (title, source)
                 values (?,?)''',
-                (topics[i], "ESL, TopPick"))
-    
+                 (topics[i], "ESL, TopPicks"))
+
 conn.commit()
 
 
-
-topicsPath =  '/Users/claudio/Desktop/MyApp/database/python-populate/topics/'
+topicsPath = '/Users/claudio/Desktop/MyApp/database/python-populate/topics/'
 
 for topicItemPath in os.listdir(topicsPath):
     with open(topicsPath + topicItemPath) as file_in:
         lines = []
-        topic=os.path.basename(topicItemPath)
-        if not topic.startswith("."): 
+        topic = os.path.basename(topicItemPath)
+        if not topic.startswith("."):
             print(topic)
             for line in file_in:
                 formatted_line = unicode(line, "utf-8")
                 if formatted_line and len(formatted_line) > 5:
                     curs.execute('''INSERT INTO questions (id, topic, title)
                             values (NULL, ?,?)''',
-                            (topic, formatted_line))
+                                 (topic, formatted_line))
 
 conn.commit()

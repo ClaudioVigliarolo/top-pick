@@ -8,7 +8,7 @@ import {
   Text,
 } from 'react-native';
 import ThemeContext from '../context/ThemeContext';
-import {Question} from '../interfaces/Interfaces';
+import {Question, Topic} from '../interfaces/Interfaces';
 import {LocalizationContext} from '../context/LocalizationContext';
 import {getColor} from '../constants/Themes';
 import ListItem from '../components/list/ListItemCheckbox';
@@ -39,7 +39,7 @@ export default function QuestionsPage({
   );
   const [isActionButtonVisible, setActionButtonVisible] = React.useState(true);
 
-  const {topic} = route.params;
+  const {topic}: {topic: Topic} = route.params;
   const mounted: any = React.useRef();
 
   React.useEffect(() => {
@@ -184,6 +184,8 @@ export default function QuestionsPage({
                   }, 2000);
                 }}
                 text={item.title}
+                id={item.id}
+                topic={topic.title}
                 onValChange={(newVal: any) => onValChange(newVal, i)}
                 value={item.selected ? true : false}
               />
